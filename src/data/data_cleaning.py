@@ -10,6 +10,8 @@ logger.addHandler(console)
 
 
 
+# changing column names
+# changing column names
 def cleaning(df: pd.DataFrame) -> pd.DataFrame:
     
     return(
@@ -33,10 +35,27 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
         .assign(airline=lambda x: x['airline'].str.lower())
         .assign(source_city=lambda x: x['source_city'].str.lower())
         .assign(destination_city=lambda x: x['destination_city'].str.lower())
-        .assign(dep_time=lambda x: pd.to_datetime(x['dep_time'], errors='coerce'))
+        .assign(dep_time=lambda x: pd.to_datetime(x['dep_time'],errors='coerce'))
         # extracting dept_hour and dept_min from dept_time
         .assign(dep_hr=lambda x: x['dep_time'].dt.hour)
         .assign(dep_min=lambda x: x['dep_time'].dt.minute)
+        .drop(columns=['Airline','Source','Destination','Route','Date_of_Journey', 'Dep_Time',
+       'Arrival_Time', 'Duration', 'Total_Stops', 'Additional_Info'])
+        #changing values in airline column as it has jet airline business and jet airway so changing jet airway business to jet airway
+        .assign(airline =lambda x:x['airline'].replace({'jet airways business':'jet airways',
+                                                      'vistara premium economy':'vistara',
+                                                      'multiple carriers premium economy':'multiple carriers'}))
+        .assign(date_of_journey=lambda x :pd.to_datetime(x['date_of_journey']))
+        .assign(arr_time=lambda x : x.loc[:,'arr_time'].str.split().str.get(0))
+        #.assign(arr_time=lambda x:pd.to_datetime(x['arr_time']).dt.time)
+        .assign(arr_time=lambda x:pd.to_datetime(x['arr_time']))
+        .assign(duration=lambda x:
+                x['duration'].str.extract(r'(\d+)h')[0].fillna(0).astype(int) * 60 +
+                x['duration'].str.extract(r'(\d+)m')[0].fillna(0).astype(int) 
+                )
+
+        
+        
     )
 
 
