@@ -1,0 +1,32 @@
+schema: '2.0'
+stages:
+  data_gathering:
+    cmd: python3 src/data/make_dataset.py
+    deps:
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: cb695e08506e44335e05298c9c783937
+      size: 797
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: dabfe9266eaeba1b69f3fe54d5722a71.dir
+      size: 1096473
+      nfiles: 1
+  data_cleaning:
+    cmd: python3 src/data/data_cleaning.py
+    deps:
+    - path: data/raw/flight_price.csv
+      hash: md5
+      md5: ea995518999e47766c19cedb8b1510bf
+      size: 1096473
+    - path: src/data/data_cleaning.py
+      hash: md5
+      md5: 38f86caadd4dfd43c3d489731bc83717
+      size: 1933
+    outs:
+    - path: data/interim
+      hash: md5
+      md5: 953bf7225e2b2a8b64cc375284d4790f.dir
+      size: 2322512
+      nfiles: 1

@@ -1,0 +1,14 @@
+stages:
+  data_gathering:
+    cmd: python3 src/data/make_dataset.py
+    deps:
+    - src/data/make_dataset.py
+    outs:
+    - data/raw
+  data_cleaning:
+    cmd: python3 src/data/data_cleaning.py
+    deps:
+    - data/raw/flight_price.csv
+    - src/data/data_cleaning.py
+    outs:
+    - data/interim

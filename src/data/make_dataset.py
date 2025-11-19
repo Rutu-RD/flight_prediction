@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-from sklearn.model_selection import train_test_split
+
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -15,10 +15,13 @@ def read_data(file_path):
 
 if __name__ == "__main__":
     # Example usage
-    file_path = os.path.join("data", "raw", "flights.csv")
+    file_path = os.path.join("data", "external", "flight_price.csv")
+    print(file_path)
     df = read_data(file_path)
     # Example: Save processed data
-    processed_path = os.path.join("data", "processed", "flights_processed.csv")
-    df.to_csv(processed_path, index=False)
-    logging.info(f"Data has been added to the processed files: {processed_path}")
+    
+    data_path = os.path.join("data", "raw")
+    os.makedirs(data_path, exist_ok=True)
 
+    df.to_csv(os.path.join(data_path, "flight_price.csv"), index=False)
+    logging.info(f"Data has been added from external folder to raw files: {data_path}")
