@@ -22,11 +22,11 @@ stages:
       size: 1096473
     - path: src/data/data_cleaning.py
       hash: md5
-      md5: 5ede42a1939ad424068cd2343a6c43a9
-      size: 3113
+      md5: 0f88feac7d13301779f640e2a6199f52
+      size: 3035
     outs:
     - path: data/interim
       hash: md5
-      md5: 3d75dfed77246da561e45cedac227702.dir
-      size: 1376679
+      md5: fc86fc4d861bde122f138fe90e789488.dir
+      size: 1376974
       nfiles: 1
