@@ -12,8 +12,9 @@ logger.addHandler(console)
 
 # changing column names
 # changing column names
+# changing column names
 def cleaning(df: pd.DataFrame) -> pd.DataFrame:
-    
+
     return(
         df
         # changing columns to lower case
@@ -41,22 +42,23 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
         .assign(dep_min=lambda x: x['dep_time'].dt.minute)
         .drop(columns=['Airline','Source','Destination','Route','Date_of_Journey', 'Dep_Time',
        'Arrival_Time', 'Duration', 'Total_Stops', 'Additional_Info'])
-        #changing values in airline column as it has jet airline business and jet airway so changing jet airway business to jet airway
-        .assign(airline =lambda x:x['airline'].replace({'jet airways business':'jet airways',
-                                                      'vistara premium economy':'vistara',
-                                                      'multiple carriers premium economy':'multiple carriers'}))
+     
         .assign(date_of_journey=lambda x :pd.to_datetime(x['date_of_journey']))
         .assign(arr_time=lambda x : x.loc[:,'arr_time'].str.split().str.get(0))
         #.assign(arr_time=lambda x:pd.to_datetime(x['arr_time']).dt.time)
         .assign(arr_time=lambda x:pd.to_datetime(x['arr_time']))
         .assign(duration=lambda x:
                 x['duration'].str.extract(r'(\d+)h')[0].fillna(0).astype(int) * 60 +
-                x['duration'].str.extract(r'(\d+)m')[0].fillna(0).astype(int) 
+                x['duration'].str.extract(r'(\d+)m')[0].fillna(0).astype(int)
                 )
+        .assign(additional_info=lambda x: 
+                np.where(x['airline'].isin(['jet airways business', 'vistara business','']),'business',x['additional_info']))
+        .assign(additional_info= lambda x: 
+                np.where(x['airline'].isin(['multiple carriers premium economy']),'premium',x['additional_info']))
+     
+        
+        )
 
-        
-        
-    )
 
 
 if __name__ == "__main__":
@@ -67,3 +69,4 @@ if __name__ == "__main__":
     os.makedirs(data_path, exist_ok=True)
     cleaned_df.to_csv(os.path.join("data","interim","cleaned_flight_price.csv"), index=False)    
     logger.info("data cleaning completed")
+
