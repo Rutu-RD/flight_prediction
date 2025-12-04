@@ -19,3 +19,5 @@ stages:
     - src/data/data_transformation.py
     outs:
     - data/transformed
+    - data/split
+

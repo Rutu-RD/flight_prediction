@@ -39,11 +39,16 @@ stages:
       size: 1429963
     - path: src/data/data_transformation.py
       hash: md5
-      md5: 570e7e11e439566c4eced1573db3dbd3
-      size: 1307
+      md5: 7bd02274da56d6837887b1c757b1f668
+      size: 2305
     outs:
+    - path: data/split
+      hash: md5
+      md5: 3c83a7fe8f4dd6b998cc271257418042.dir
+      size: 1229618
+      nfiles: 4
     - path: data/transformed
       hash: md5
-      md5: d8916b1a0691a47b00086448956feb25.dir
-      size: 1590922
+      md5: 70e76facb3512b78f1087137e9309dbc.dir
+      size: 1537495
       nfiles: 1
