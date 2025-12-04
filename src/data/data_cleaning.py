@@ -55,7 +55,7 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
                 np.where(x['airline'].isin(['jet airways business', 'vistara business','']),'business',x['additional_info']))
         .assign(additional_info= lambda x: 
                 np.where(x['airline'].isin(['multiple carriers premium economy']),'premium',x['additional_info']))
-     
+       
         
         )
 
@@ -65,8 +65,9 @@ if __name__ == "__main__":
     logger.info("data cleaning starting")
     df=pd.read_csv(os.path.join( "data","raw", "flight_price.csv"))
     cleaned_df=cleaning(df)
+    cleaned_df.info()
     data_path = os.path.join("data", "interim")
     os.makedirs(data_path, exist_ok=True)
-    cleaned_df.to_csv(os.path.join("data","interim","cleaned_flight_price.csv"), index=False)    
+    cleaned_df.to_csv(os.path.join("data","interim","cleaned_flight_price.csv"))    
     logger.info("data cleaning completed")
 
