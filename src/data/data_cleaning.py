@@ -37,9 +37,8 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
         .assign(source_city=lambda x: x['source_city'].str.lower())
         .assign(destination_city=lambda x: x['destination_city'].str.lower())
         .assign(dep_time=lambda x: pd.to_datetime(x['dep_time'],errors='coerce'))
-        # extracting dept_hour and dept_min from dept_time
-        .assign(dep_hr=lambda x: x['dep_time'].dt.hour)
-        .assign(dep_min=lambda x: x['dep_time'].dt.minute)
+        
+       
         .drop(columns=['Airline','Source','Destination','Route','Date_of_Journey', 'Dep_Time',
        'Arrival_Time', 'Duration', 'Total_Stops', 'Additional_Info'])
      

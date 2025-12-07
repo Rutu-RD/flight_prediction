@@ -22,33 +22,28 @@ stages:
       size: 1096473
     - path: src/data/data_cleaning.py
       hash: md5
-      md5: 53733bd0f20061e19982a87b304d2cbc
-      size: 3046
+      md5: a66d75733809995d297e44291a2b2436
+      size: 2889
     outs:
     - path: data/interim
       hash: md5
-      md5: d092f4b45039053c62b98519fb80fb15.dir
-      size: 1429963
+      md5: f5268c56ca47561b1e0f345b3b117368.dir
+      size: 1372946
       nfiles: 1
   data_transformation:
     cmd: python3 src/data/data_transformation.py
     deps:
     - path: data/interim/cleaned_flight_price.csv
       hash: md5
-      md5: faedc49409196c85cf72acf0b0c16f65
-      size: 1429963
+      md5: 0eb8abcb4bb40d913070da420a7e6472
+      size: 1372946
     - path: src/data/data_transformation.py
       hash: md5
-      md5: 7bd02274da56d6837887b1c757b1f668
-      size: 2305
+      md5: dcf2de36a5aecc91fba8a5b62cfff3b4
+      size: 1552
     outs:
-    - path: data/split
-      hash: md5
-      md5: 3c83a7fe8f4dd6b998cc271257418042.dir
-      size: 1229618
-      nfiles: 4
     - path: data/transformed
       hash: md5
-      md5: 70e76facb3512b78f1087137e9309dbc.dir
-      size: 1537495
+      md5: aa3e9d22c225ba52d9bd19845b46848d.dir
+      size: 911534
       nfiles: 1

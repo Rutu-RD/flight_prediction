@@ -19,5 +19,18 @@ stages:
     - src/data/data_transformation.py
     outs:
     - data/transformed
-    - data/split
-
+  feature_engineering:
+    cmd: python3 src/features/feature_engineering.py
+    deps:
+    - data/transformed/transformed_flight_price.csv
+    - src/features/feature_engineering.py
+    outs:
+    - data/features
+  data_splitting:
+    cmd: python3 src/models/splliting.py
+    deps:
+    - data/features/feature_engineered_flight_price.csv
+    - src/models/splliting.py
+    outs:
+    - data/splited data  
+    
