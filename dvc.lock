@@ -39,11 +39,145 @@ stages:
       size: 1372946
     - path: src/data/data_transformation.py
       hash: md5
-      md5: dcf2de36a5aecc91fba8a5b62cfff3b4
-      size: 1552
+      md5: ab3c660f2752723d40cecc7748980ea6
+      size: 1560
     outs:
     - path: data/transformed
       hash: md5
       md5: aa3e9d22c225ba52d9bd19845b46848d.dir
       size: 911534
       nfiles: 1
+  feature_engineering:
+    cmd: python3 src/features/feature_engineering.py
+    deps:
+    - path: data/transformed/transformed_flight_price.csv
+      hash: md5
+      md5: 23ce7d256642c5f175a568b39d69ae45
+      size: 911534
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: ed638ec4770e3272f5e03481fc56a6f0
+      size: 1223
+    outs:
+    - path: data/features
+      hash: md5
+      md5: 0b6f8a49d983a746839513d9fa2677fb.dir
+      size: 783698
+      nfiles: 1
+  data_splitting:
+    cmd: python3 src/model/splitting.py
+    deps:
+    - path: data/features/feature_engineered_flight_price.csv
+      hash: md5
+      md5: 56845c59b159d18f508f7263c0614a63
+      size: 783698
+    - path: src/model/splitting.py
+      hash: md5
+      md5: 1701659352b6aa3412ae99c65ad711f9
+      size: 1574
+    outs:
+    - path: data/splitted_data
+      hash: md5
+      md5: b17a32689c1950c1caf0b90e61829ab2.dir
+      size: 784028
+      nfiles: 6
+  feature_encoding:
+    cmd: python3 src/model/encoding_features.py
+    deps:
+    - path: data/splitted_data/X_test.csv
+      hash: md5
+      md5: e43698e21240c72e453d4e1885e1ba40
+      size: 141751
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/X_val.csv
+      hash: md5
+      md5: 9f89c1ea6223aefc3fc7b91f5639a623
+      size: 112648
+    - path: src/model/encoding_features.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+  train_model:
+    cmd: python3 -m src.model.train_model
+    deps:
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/y_train.csv
+      hash: md5
+      md5: fde8d9bb50504cc0a8ae15200cc87594
+      size: 50620
+    - path: src/model/pipeline.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+    - path: src/model/train_model.py
+      hash: md5
+      md5: 33bd888c035fcdd8ec0224b586025eed
+      size: 1443
+    outs:
+    - path: models/random_forest_model.pkl
+      hash: md5
+      md5: 3814a6bbd4ea16d23f26d925b9935b68
+      size: 5803866
+  encoding_features:
+    cmd: python3 -m src.model.encoding_features
+    deps:
+    - path: data/splitted_data/X_test.csv
+      hash: md5
+      md5: e43698e21240c72e453d4e1885e1ba40
+      size: 141751
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/X_val.csv
+      hash: md5
+      md5: 9f89c1ea6223aefc3fc7b91f5639a623
+      size: 112648
+    - path: src/model/encoding_features.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+  pipeline:
+    cmd: python3 -m src.model.pipeline
+    deps:
+    - path: data/splitted_data/X_test.csv
+      hash: md5
+      md5: e43698e21240c72e453d4e1885e1ba40
+      size: 141751
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/X_val.csv
+      hash: md5
+      md5: 9f89c1ea6223aefc3fc7b91f5639a623
+      size: 112648
+    - path: src/model/pipeline.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+  evaluate_model:
+    cmd: python3 -m src.model.evaluate_model
+    deps:
+    - path: data/splitted_data/X_val.csv
+      hash: md5
+      md5: 9f89c1ea6223aefc3fc7b91f5639a623
+      size: 112648
+    - path: data/splitted_data/y_val.csv
+      hash: md5
+      md5: 5b78c512da5945930cda202bc37805f2
+      size: 12683
+    - path: models/random_forest_model.pkl
+      hash: md5
+      md5: 3814a6bbd4ea16d23f26d925b9935b68
+      size: 5803866
+    - path: src/model/evaluate_model.py
+      hash: md5
+      md5: 72a3f1ddb009e2ee8ad191de61779109
+      size: 1184

@@ -27,10 +27,33 @@ stages:
     outs:
     - data/features
   data_splitting:
-    cmd: python3 src/models/splliting.py
+    cmd: python3 src/model/splitting.py
     deps:
     - data/features/feature_engineered_flight_price.csv
-    - src/models/splliting.py
+    - src/model/splitting.py
     outs:
-    - data/splited data  
+    - data/splitted_data
+  pipeline:
+    cmd: python3 -m src.model.pipeline
+    deps:
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/X_val.csv
+    - data/splitted_data/X_test.csv
+    - src/model/pipeline.py
+  train_model:
+    cmd: python3 -m src.model.train_model
+    deps:
+    - src/model/pipeline.py 
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
+    - src/model/train_model.py
+    outs:
+    - models/random_forest_model.pkl
+  evaluate_model:
+    cmd: python3 -m src.model.evaluate_model
+    deps:
+    - models/random_forest_model.pkl
+    - data/splitted_data/X_val.csv
+    - data/splitted_data/y_val.csv
+    - src/model/evaluate_model.py 
     

@@ -22,6 +22,7 @@ def transformation(df: pd.DataFrame) -> pd.DataFrame:
        .assign(dep_hr=lambda x: x['dep_time'].dt.hour)
        .assign(dep_min=lambda x: x['dep_time'].dt.minute)
        .drop(columns=['route','dep_time','arr_time'] )
+       
        )
 
 

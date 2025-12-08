@@ -15,8 +15,9 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
         df
         #weekeday feature
        .assign(day_of_week=lambda x: x['date_of_journey'].dt.dayofweek)
-       .assign(is_weekend=lambda x: np.where(x['day_of_week'].isin([5,6]),1,0))
-       .drop(columns=['date_of_journey'] )
+       .assign(is_weekend=lambda x: x['day_of_week'].isin([5,6]).astype(int))
+       .drop(columns=['date_of_journey','Unnamed: 0'] )
+       .drop(index=748)
     )
 
 
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     logger.info("feature engineering starting")
     df=pd.read_csv(os.path.join( "data","transformed", "transformed_flight_price.csv"), parse_dates=["date_of_journey"])
     engineered_df=feature_engineering(df)
-    engineered_df.drop(columns=['Unnamed: 0'], inplace=True, errors='ignore')
+    
     data_path = os.path.join("data", "features")
     os.makedirs(data_path, exist_ok=True)
     engineered_df.to_csv(os.path.join("data","features","feature_engineered_flight_price.csv"), index=False)    
