@@ -66,4 +66,12 @@ stages:
     - data/splitted_data/X_val.csv
     - data/splitted_data/y_val.csv
     - src/model/evaluate_model.py 
+  hyperparameter_tuning_eval:
+    cmd: python3 -m src.model.hyperparameter_tuning_eval
+    deps:
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
+    - data/splitted_data/X_val.csv
+    - data/splitted_data/y_val.csv
+    - src/model/hyperparameter_tuning_eval.py
     

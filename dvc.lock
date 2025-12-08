@@ -175,12 +175,12 @@ stages:
       size: 12683
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: 3814a6bbd4ea16d23f26d925b9935b68
-      size: 5803866
+      md5: 1ee1d879f8f7c3af0c3ff90591e0d62d
+      size: 5803850
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: df65f172e80cad240485a7d8563a5200
-      size: 2561
+      md5: e34f63368d2e89f9f58aaeac7c7ee2e5
+      size: 3329
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -198,13 +198,13 @@ stages:
       size: 1322
     - path: src/model/train_model_rf.py
       hash: md5
-      md5: 33bd888c035fcdd8ec0224b586025eed
-      size: 1443
+      md5: 03b1d0ad3a3061f5916699108b069651
+      size: 1939
     outs:
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: 3814a6bbd4ea16d23f26d925b9935b68
-      size: 5803866
+      md5: 1ee1d879f8f7c3af0c3ff90591e0d62d
+      size: 5803850
   train_model_xgboost:
     cmd: python3 -m src.model.train_model_xgboost
     deps:
@@ -229,3 +229,26 @@ stages:
       hash: md5
       md5: 3d0e04ff37371400cd9014fba28a2942
       size: 1150908
+  hyperparameter_tuning_eval:
+    cmd: python3 -m src.model.hyperparameter_tuning_eval
+    deps:
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/X_val.csv
+      hash: md5
+      md5: 9f89c1ea6223aefc3fc7b91f5639a623
+      size: 112648
+    - path: data/splitted_data/y_train.csv
+      hash: md5
+      md5: fde8d9bb50504cc0a8ae15200cc87594
+      size: 50620
+    - path: data/splitted_data/y_val.csv
+      hash: md5
+      md5: 5b78c512da5945930cda202bc37805f2
+      size: 12683
+    - path: src/model/hyperparameter_tuning_eval.py
+      hash: md5
+      md5: e16e33afd32e1eaec3a09fb64e6277c6
+      size: 4226

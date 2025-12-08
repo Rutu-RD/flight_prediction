@@ -13,13 +13,16 @@ logger = logging.getLogger(__name__)
 logger.addHandler(console)
 import mlflow
 import dagshub
-import mlflow.sklearn
+from src.model.train_model_rf import RandomForestRegressor
+from mlflow.sklearn import log_model
 
 
 if __name__ == "__main__":
-   dagshub.init(repo_owner='Rutu-RD', repo_name='dagshub_flight_prediction', mlflow=True)
-   mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/dagshub_flight_prediction.mlflow")
-   dagshub.init(repo_owner='Rutu-RD', repo_name='dagshub_flight_prediction', mlflow=True)
+   # dagshub and mlflow initialization
+   dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
+   
+   mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
+   
    mlflow.set_experiment("flight_price_random_forest_experiment")
    with mlflow.start_run(run_name="random_forest_model_evaluation"):
         logger.info("model evaluation starting")
@@ -41,33 +44,42 @@ if __name__ == "__main__":
         logger.info(f"Mean Absolute Error: {mae}")
         logger.info(f"Mean Squared Error: {mse}")
         logger.info(f"R^2 Score: {r2}")
+        # logging metrics to mlflow
         mlflow.log_metric("MAE", mae)
         mlflow.log_metric("MSE", mse)
         mlflow.log_metric("R2_Score", r2)
-        mlflow.sklearn.log_model(model_pipeline, "random_forest_model")
+        mlflow.sklearn.log_model(
+        sk_model=model_pipeline,
+        artifact_path="model_pipeline",
+        registered_model_name="flight_price_pipeline")
+
         
         with open("params.yaml") as f:
             params = safe_load(f)
+    
         n = params['model']['random_forest']['n_estimators']
         max_depth = params['model']['random_forest']['max_depth']
         mlflow.log_param("max_depth", max_depth)
 
         mlflow.log_param("n_estimators", n)
+      
         logger.info("RF model evaluation completed")
-#    with mlflow.start_run(run_name="xgboost_model_evaluation"):
-
-
- #       logger.info(" xgboost model evaluation starting")
- #       model_pipeline: Pipeline = joblib.load(os.path.join("models", "xgboost_model.pkl"))
- #       logger.info("xgboost model loaded successfully")
- #       y_pred = model_pipeline.predict(x_test)
- #       mae = mean_absolute_error(y_test, y_pred)
- #       mse = mean_squared_error(y_test, y_pred)
-  #      r2 = r2_score(y_test, y_pred)
- #       logger.info(f"Mean Absolute Error: {mae}")
- #       logger.info(f"Mean Squared Error: {mse}")
- #       logger.info(f"R^2 Score: {r2}")
-  #      logger.info("xgboost model evaluation completed")
-  #      mlflow.log_metric("MAE", mae)
-   #     mlflow.log_metric("MSE", mse)
-   #     mlflow.log_metric("R2_Score", r2)   
+   with mlflow.start_run(run_name="xgboost_model_evaluation"):
+       logger.info(" xgboost model evaluation starting")
+       model_pipeline: Pipeline = joblib.load(os.path.join("models", "xgboost_model.pkl"))
+       logger.info("xgboost model loaded successfully")
+       y_pred = model_pipeline.predict(x_test)
+       mae = mean_absolute_error(y_test, y_pred)
+       mse = mean_squared_error(y_test, y_pred)
+       r2 = r2_score(y_test, y_pred)
+       logger.info(f"Mean Absolute Error: {mae}")
+       logger.info(f"Mean Squared Error: {mse}")
+       logger.info(f"R^2 Score: {r2}")
+       logger.info("xgboost model evaluation completed")
+       mlflow.log_metric("MAE", mae)
+       mlflow.log_metric("MSE", mse)
+       mlflow.log_metric("R2_Score", r2)   
+       mlflow.sklearn.log_model(
+       sk_model=model_pipeline,
+       artifact_path="model_pipeline",
+       registered_model_name="flight_price_pipeline")
