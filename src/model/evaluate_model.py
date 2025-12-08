@@ -12,11 +12,16 @@ console = logging.StreamHandler()
 logger = logging.getLogger(__name__)
 logger.addHandler(console)
 import mlflow
-mlflow.set_tracking_uri("http://localhost:5000")
+import dagshub
+import mlflow.sklearn
+
 
 if __name__ == "__main__":
-    mlflow.set_experiment("flight_price_prediction model evaluation")
-    with mlflow.start_run(run_name="random_forest_model_evaluation"):
+   dagshub.init(repo_owner='Rutu-RD', repo_name='dagshub_flight_prediction', mlflow=True)
+   mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/dagshub_flight_prediction.mlflow")
+   dagshub.init(repo_owner='Rutu-RD', repo_name='dagshub_flight_prediction', mlflow=True)
+   mlflow.set_experiment("flight_price_random_forest_experiment")
+   with mlflow.start_run(run_name="random_forest_model_evaluation"):
         logger.info("model evaluation starting")
 
         x_test = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
@@ -39,6 +44,15 @@ if __name__ == "__main__":
         mlflow.log_metric("MAE", mae)
         mlflow.log_metric("MSE", mse)
         mlflow.log_metric("R2_Score", r2)
+        mlflow.sklearn.log_model(model_pipeline, "random_forest_model")
+        
+        with open("params.yaml") as f:
+            params = safe_load(f)
+        n = params['model']['random_forest']['n_estimators']
+        max_depth = params['model']['random_forest']['max_depth']
+        mlflow.log_param("max_depth", max_depth)
+
+        mlflow.log_param("n_estimators", n)
         logger.info("RF model evaluation completed")
 #    with mlflow.start_run(run_name="xgboost_model_evaluation"):
 

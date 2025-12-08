@@ -179,8 +179,8 @@ stages:
       size: 5803866
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: 72a3f1ddb009e2ee8ad191de61779109
-      size: 1184
+      md5: df65f172e80cad240485a7d8563a5200
+      size: 2561
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
