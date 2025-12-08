@@ -3,4 +3,8 @@ model:
   random_forest:
     n_estimators: 100
     max_depth: 10
-    
+  xgboost:
+    n_estimators: 150
+    max_depth: 8
+    random_state: 42
+    learning_rate: 0.1

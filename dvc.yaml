@@ -40,15 +40,25 @@ stages:
     - data/splitted_data/X_val.csv
     - data/splitted_data/X_test.csv
     - src/model/pipeline.py
-  train_model:
-    cmd: python3 -m src.model.train_model
+  train_model_rf:
+    cmd: python3 -m src.model.train_model_rf
     deps:
     - src/model/pipeline.py 
     - data/splitted_data/X_train.csv
     - data/splitted_data/y_train.csv
-    - src/model/train_model.py
+    - src/model/train_model_rf.py
     outs:
     - models/random_forest_model.pkl
+  train_model_xgboost:
+    cmd: python3 -m src.model.train_model_xgboost
+    deps:
+    - src/model/pipeline.py
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
+    - src/model/train_model_xgboost.py
+    outs:
+    - models/xgboost_model.pkl
+  
   evaluate_model:
     cmd: python3 -m src.model.evaluate_model
     deps:

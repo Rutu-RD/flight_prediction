@@ -181,3 +181,51 @@ stages:
       hash: md5
       md5: 72a3f1ddb009e2ee8ad191de61779109
       size: 1184
+  train_model_rf:
+    cmd: python3 -m src.model.train_model_rf
+    deps:
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/y_train.csv
+      hash: md5
+      md5: fde8d9bb50504cc0a8ae15200cc87594
+      size: 50620
+    - path: src/model/pipeline.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+    - path: src/model/train_model_rf.py
+      hash: md5
+      md5: 33bd888c035fcdd8ec0224b586025eed
+      size: 1443
+    outs:
+    - path: models/random_forest_model.pkl
+      hash: md5
+      md5: 3814a6bbd4ea16d23f26d925b9935b68
+      size: 5803866
+  train_model_xgboost:
+    cmd: python3 -m src.model.train_model_xgboost
+    deps:
+    - path: data/splitted_data/X_train.csv
+      hash: md5
+      md5: 34e6e43e257a88c792b001f76472baf4
+      size: 450467
+    - path: data/splitted_data/y_train.csv
+      hash: md5
+      md5: fde8d9bb50504cc0a8ae15200cc87594
+      size: 50620
+    - path: src/model/pipeline.py
+      hash: md5
+      md5: db33a0e160a7caa0ffbd5bb330347923
+      size: 1322
+    - path: src/model/train_model_xgboost.py
+      hash: md5
+      md5: 52d582f7340baabfc281afae4b085f23
+      size: 1573
+    outs:
+    - path: models/xgboost_model.pkl
+      hash: md5
+      md5: 3d0e04ff37371400cd9014fba28a2942
+      size: 1150908
