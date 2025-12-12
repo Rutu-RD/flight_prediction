@@ -23,8 +23,8 @@ if __name__ == "__main__":
    
    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
    
-   mlflow.set_experiment("flight_price_random_forest_experiment")
-   with mlflow.start_run(run_name="random_forest_model_evaluation"):
+   mlflow.set_experiment("flight_price_experiments")
+   with mlflow.start_run(run_name="rf_model_evaluation"):
         logger.info("model evaluation starting")
 
         x_test = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         mlflow.log_param("n_estimators", n)
       
         logger.info("RF model evaluation completed")
-   with mlflow.start_run(run_name="xgboost_model_evaluation"):
+   with mlflow.start_run(run_name="xgb_model_evaluation"):
        logger.info(" xgboost model evaluation starting")
        model_pipeline: Pipeline = joblib.load(os.path.join("models", "xgboost_model.pkl"))
        logger.info("xgboost model loaded successfully")

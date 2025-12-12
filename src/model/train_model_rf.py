@@ -20,8 +20,8 @@ if __name__=="__main__":
    
    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
    
-   mlflow.set_experiment("flight_price_random_forest_experiment")
-   with mlflow.start_run(run_name="random_forest_model_training"):
+   mlflow.set_experiment("flight_price_rfexperiment")
+   with mlflow.start_run(run_name="rf_model_training"):
         logger.info("training random forest regressor model")   
 
 
@@ -42,7 +42,7 @@ if __name__=="__main__":
             params = safe_load(f)
         n_estimators = params['model']['random_forest']['n_estimators']
         max_depth = params['model']['random_forest']['max_depth']
-
+       
         rf = RandomForestRegressor(
             n_estimators=n_estimators,
             max_depth=max_depth,
@@ -56,7 +56,7 @@ if __name__=="__main__":
 
         model_pipeline.fit(x_train, y_train)
         logger.info("model training completed")
-        mlflow.sklearn.log_model(model_pipeline, "random_forest_model")
+        #mlflow.sklearn.log_model(model_pipeline, "random_forest_model")
 
         os.makedirs("models", exist_ok=True)
         joblib.dump(model_pipeline, os.path.join("models", "random_forest_model.pkl"))

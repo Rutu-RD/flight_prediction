@@ -71,6 +71,10 @@ stages:
       hash: md5
       md5: 56845c59b159d18f508f7263c0614a63
       size: 783698
+    - path: params.yaml
+      hash: md5
+      md5: 2a24cb60f7fae472353978e8f03205ff
+      size: 172
     - path: src/model/splitting.py
       hash: md5
       md5: 1701659352b6aa3412ae99c65ad711f9
@@ -179,8 +183,8 @@ stages:
       size: 5803850
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: e34f63368d2e89f9f58aaeac7c7ee2e5
-      size: 3329
+      md5: f7c10032168655745720d51a69f69185
+      size: 3301
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -192,14 +196,18 @@ stages:
       hash: md5
       md5: fde8d9bb50504cc0a8ae15200cc87594
       size: 50620
+    - path: params.yaml
+      hash: md5
+      md5: 2a24cb60f7fae472353978e8f03205ff
+      size: 172
     - path: src/model/pipeline.py
       hash: md5
       md5: db33a0e160a7caa0ffbd5bb330347923
       size: 1322
     - path: src/model/train_model_rf.py
       hash: md5
-      md5: 03b1d0ad3a3061f5916699108b069651
-      size: 1939
+      md5: e452a68f32cf7986efca321b1caa395c
+      size: 1924
     outs:
     - path: models/random_forest_model.pkl
       hash: md5
@@ -216,6 +224,10 @@ stages:
       hash: md5
       md5: fde8d9bb50504cc0a8ae15200cc87594
       size: 50620
+    - path: params.yaml
+      hash: md5
+      md5: 2a24cb60f7fae472353978e8f03205ff
+      size: 172
     - path: src/model/pipeline.py
       hash: md5
       md5: db33a0e160a7caa0ffbd5bb330347923
@@ -227,8 +239,8 @@ stages:
     outs:
     - path: models/xgboost_model.pkl
       hash: md5
-      md5: 3d0e04ff37371400cd9014fba28a2942
-      size: 1150908
+      md5: 46c40d76e2ad122d6a4a5d6e31fd6ea4
+      size: 1438021
   hyperparameter_tuning_eval:
     cmd: python3 -m src.model.hyperparameter_tuning_eval
     deps:
@@ -248,7 +260,11 @@ stages:
       hash: md5
       md5: 5b78c512da5945930cda202bc37805f2
       size: 12683
+    - path: params.yaml
+      hash: md5
+      md5: 2a24cb60f7fae472353978e8f03205ff
+      size: 172
     - path: src/model/hyperparameter_tuning_eval.py
       hash: md5
-      md5: e16e33afd32e1eaec3a09fb64e6277c6
-      size: 4226
+      md5: 425aa42998851dee7391ded6feff6c7a
+      size: 6495
