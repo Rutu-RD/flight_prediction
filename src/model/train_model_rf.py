@@ -20,7 +20,7 @@ if __name__=="__main__":
    
    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
    
-   mlflow.set_experiment("flight_price_random_forest_ experiment")
+   mlflow.set_experiment("flight_price_train_model_rf_tracking")
    with mlflow.start_run(run_name="random_forest_model_training"):
         logger.info("training random forest regressor model")   
         x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))

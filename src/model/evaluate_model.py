@@ -23,23 +23,22 @@ if __name__ == "__main__":
    
    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
    
-   mlflow.set_experiment("flight_price_experiment(evaluate_model)_tracking")
-   with mlflow.start_run(run_name="random_forest_model_evaluation"):
+   mlflow.set_experiment("Evaluation_of_RF_and_XGB_models(baseline_models)")
+
+   #getting x_val and y_val from splitted data
+   x_val = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
+   y_val = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv")) 
+   with mlflow.start_run(run_name="RF_Model_Evaluation"):
         logger.info("model evaluation starting")
-
-        x_test = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
-        y_test = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv"))
-
-        if isinstance(y_test, pd.DataFrame) and y_test.shape[1] == 1:
-            y_test = y_test.iloc[:, 0]
-
+        if isinstance(y_val, pd.DataFrame) and y_val.shape[1] == 1:
+            y_val = y_val.iloc[:, 0]
         model_pipeline: Pipeline = joblib.load(os.path.join("models", "random_forest_model.pkl"))
         logger.info("random forest model loaded successfully")
-        y_pred = model_pipeline.predict(x_test)
+        y_pred = model_pipeline.predict(x_val)
 
-        mae = mean_absolute_error(y_test, y_pred)
-        mse = mean_squared_error(y_test, y_pred)
-        r2 = r2_score(y_test, y_pred)
+        mae = mean_absolute_error(y_val, y_pred)
+        mse = mean_squared_error(y_val, y_pred)
+        r2 = r2_score(y_val, y_pred)
 
         logger.info(f"Mean Absolute Error: {mae}")
         logger.info(f"Mean Squared Error: {mse}")
@@ -50,8 +49,7 @@ if __name__ == "__main__":
         mlflow.log_metric("R2_Score", r2)
         mlflow.sklearn.log_model(
         sk_model=model_pipeline,
-        artifact_path="model_pipeline",
-        registered_model_name="flight_price_pipeline")
+        artifact_path="model_pipeline",)
 
         
         with open("params.yaml") as f:
@@ -64,22 +62,30 @@ if __name__ == "__main__":
         mlflow.log_param("n_estimators", n)
       
         logger.info("RF model evaluation completed")
-   with mlflow.start_run(run_name="xgb_model_evaluation"):
+   with mlflow.start_run(run_name="XGB_Model_Evaluation"):
        logger.info(" xgboost model evaluation starting")
        model_pipeline: Pipeline = joblib.load(os.path.join("models", "xgboost_model.pkl"))
        logger.info("xgboost model loaded successfully")
-       y_pred = model_pipeline.predict(x_test)
-       mae = mean_absolute_error(y_test, y_pred)
-       mse = mean_squared_error(y_test, y_pred)
-       r2 = r2_score(y_test, y_pred)
+       y_pred = model_pipeline.predict(x_val)
+       mae = mean_absolute_error(y_val, y_pred)
+       mse = mean_squared_error(y_val, y_pred)
+       r2 = r2_score(y_val, y_pred)
        logger.info(f"Mean Absolute Error: {mae}")
        logger.info(f"Mean Squared Error: {mse}")
        logger.info(f"R^2 Score: {r2}")
-       logger.info("xgboost model evaluation completed")
+       
        mlflow.log_metric("MAE", mae)
        mlflow.log_metric("MSE", mse)
        mlflow.log_metric("R2_Score", r2)   
        mlflow.sklearn.log_model(
        sk_model=model_pipeline,
-       artifact_path="model_pipeline",
-       registered_model_name="flight_price_pipeline")
+       artifact_path="model_pipeline")
+       with open("params.yaml") as f:
+              params = safe_load(f) 
+       n = params['model']['xgboost']['n_estimators']
+       max_depth = params['model']['xgboost']['max_depth']
+       learning_rate = params['model']['xgboost']['learning_rate']
+       mlflow.log_param("max_depth", max_depth)
+       mlflow.log_param("n_estimators", n)
+       mlflow.log_param("learning_rate", learning_rate)
+       logger.info("xgboost model evaluation completed")

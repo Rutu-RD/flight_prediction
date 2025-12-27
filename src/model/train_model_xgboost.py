@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(console)
 
 if __name__=="__main__":
-    logger.info("training xgboost regressor model")
+    logger.info("flight prediction train_xgboost_tracking")
 
     x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
     y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))

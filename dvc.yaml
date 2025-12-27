@@ -34,13 +34,13 @@ stages:
     - params.yaml
     outs:
     - data/splitted_data
-  pipeline:
-    cmd: python3 -m src.model.pipeline
-    deps:
-    - data/splitted_data/X_train.csv
-    - data/splitted_data/X_val.csv
-    - data/splitted_data/X_test.csv
-    - src/model/pipeline.py
+  # pipeline:
+  #   cmd: python3 -m src.model.pipeline
+  #   deps:
+  #   - data/splitted_data/X_train.csv
+  #   - data/splitted_data/X_val.csv
+  #   - data/splitted_data/X_test.csv
+  #   - src/model/pipeline.py
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -66,6 +66,9 @@ stages:
     cmd: python3 -m src.model.evaluate_model
     deps:
     - models/random_forest_model.pkl
+    - models/xgboost_model.pkl
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
     - data/splitted_data/X_val.csv
     - data/splitted_data/y_val.csv
     - src/model/evaluate_model.py

@@ -17,19 +17,20 @@ logging.basicConfig(level=logging.INFO)
 console = logging.StreamHandler()
 logger = logging.getLogger(__name__)
 logger.addHandler(console)
-
+# getting x_train, y_train, x_val, y_val from splitted data
+x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
+y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
+x_val = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
+y_val = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv"))
 
 if __name__ == "__main__":
     # Init DagsHub + MLflow
     dagshub.init(repo_owner="Rutu-RD", repo_name="flight_prediction", mlflow=True)
     mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
-    mlflow.set_experiment("flight_price_hyperparameter(xgb,rf)_tracking")
+    mlflow.set_experiment("flight_price_hyperparameter_tuning_experiments")
 
     # Load data (train + val)
-    x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
-    y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
-    x_val = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
-    y_val = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv"))
+    
 
     if isinstance(y_train, pd.DataFrame) and y_train.shape[1] == 1:
         y_train = y_train.iloc[:, 0]
@@ -46,27 +47,24 @@ if __name__ == "__main__":
 
     # Candidate n_estimators values to try
     #    (you can later move this into params.yaml if you want)
-    n_estimators_list = [100, 200, 300, 400, 500,base_n]
-    depth=[i for i in range(1,base_depth+10,2)]
+    with open("params.yaml") as f:
+        params = safe_load(f)
+    n_estimators_list = params["hyperparameter_models"]["random_forest"]["n_estimators"]
+    depth = params["hyperparameter_models"]["random_forest"]["max_depth"]
     best_mae = float("inf")
+    best_mse=  float("inf")
+    best_r2= float("-inf")
     best_config = None
 
     #  Parent run for RF hyperparameter search
     with mlflow.start_run(run_name="rf_hyperparameter_tuning") as parent_run:
         logger.info(f"Parent run id: {parent_run.info.run_id}")
-
-        # Log the base depth once at parent level
-        mlflow.log_param("depth", base_depth)
-
         for n in n_estimators_list:
-            
             for d in depth:
                 run_name = f"rf_n_estimators{n}_depth{d}"
-
                 with mlflow.start_run(run_name=run_name, nested=True):
                     logger.info(f"Starting child run: {run_name}")
-
-                    rf = RandomForestRegressor(
+                    rf_hp = RandomForestRegressor(
                         n_estimators=n,
                         max_depth=d,
                         random_state=42,
@@ -75,7 +73,7 @@ if __name__ == "__main__":
 
                     model_pipeline = Pipeline(steps=[
                         ("preprocessor", build_preprocessor()),
-                        ("model", rf),
+                        ("model", rf_hp),
                     ])
 
                     # Fit pipeline
@@ -104,24 +102,23 @@ if __name__ == "__main__":
 
                     # Log full sklearn pipeline (if your MLflow+DagsHub combo supports it)
                     mlflow.sklearn.log_model(
-                        sk_model=model_pipeline,
+                        sk_model=rf_hp,
                         artifact_path="model_pipeline",
-                        registered_model_name="flight_price_pipeline"
                     )
 
     # Hyperparameter training for xgboost
     with mlflow.start_run(run_name="xgb_hyperparameter_tuning") as parent_run:
         logger.info("starting parent run for xgboost")
-        learning_rates = [0.01, 0.1, 0.2, 0.3]
-        n_estimators_list = [100, 200, 300, 400, 500]
-        max_depths = [3, 5, 7, 9, 11]
+        learning_rates = params["hyperparameter_models"]["xgboost"]["learning_rate"]
+        n_estimators_list = params["hyperparameter_models"]["xgboost"]["n_estimators"]
+        depths = params["hyperparameter_models"]["xgboost"]["max_depth"]
         for lr in learning_rates:
             for n in n_estimators_list:
-                for d in max_depths:
+                for d in depths:
                     run_name=f"xgboost {lr} lr n{n} {d}d(depth)"
                     with mlflow.start_run(run_name=run_name,nested=True):
                         logger.info(f"starting child run {run_name}")
-                        xgb = XGBRegressor(
+                        xgb_hp = XGBRegressor(
                             learning_rate=lr,
                             n_estimators=n,
                             max_depth=d,
@@ -129,7 +126,7 @@ if __name__ == "__main__":
                         )
                         model_pipeline=Pipeline(steps=[
                             ("processor",build_preprocessor()),
-                            ("model",xgb)])
+                            ("model",xgb_hp)])
                         logger.info("fitting xgboost model pipeline")
                         model_pipeline.fit(x_train,y_train)
                         logger.info("evaluating on validation set")
@@ -146,7 +143,6 @@ if __name__ == "__main__":
                         mlflow.log_param("max_depth",d)
                         mlflow.log_param("model_type","XGBRegressor")
                         mlflow.sklearn.log_model(
-                            sk_model=model_pipeline,
+                            sk_model=xgb_hp,
                             artifact_path="model_pipeline",
-                            registered_model_name="flight_price_pipeline"
                         )
