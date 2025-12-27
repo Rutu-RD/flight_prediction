@@ -2,3 +2,5 @@ pandas
 numpy
 matplotlib
 scikit-learn
+dagshub
+mlflow==2.14.0

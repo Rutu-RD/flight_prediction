@@ -31,15 +31,16 @@ stages:
     deps:
     - data/features/feature_engineered_flight_price.csv
     - src/model/splitting.py
+    - params.yaml
     outs:
     - data/splitted_data
-  pipeline:
-    cmd: python3 -m src.model.pipeline
-    deps:
-    - data/splitted_data/X_train.csv
-    - data/splitted_data/X_val.csv
-    - data/splitted_data/X_test.csv
-    - src/model/pipeline.py
+  # pipeline:
+  #   cmd: python3 -m src.model.pipeline
+  #   deps:
+  #   - data/splitted_data/X_train.csv
+  #   - data/splitted_data/X_val.csv
+  #   - data/splitted_data/X_test.csv
+  #   - src/model/pipeline.py
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -47,6 +48,7 @@ stages:
     - data/splitted_data/X_train.csv
     - data/splitted_data/y_train.csv
     - src/model/train_model_rf.py
+    - params.yaml
     outs:
     - models/random_forest_model.pkl
   train_model_xgboost:
@@ -56,6 +58,7 @@ stages:
     - data/splitted_data/X_train.csv
     - data/splitted_data/y_train.csv
     - src/model/train_model_xgboost.py
+    - params.yaml
     outs:
     - models/xgboost_model.pkl
   
@@ -63,7 +66,20 @@ stages:
     cmd: python3 -m src.model.evaluate_model
     deps:
     - models/random_forest_model.pkl
+    - models/xgboost_model.pkl
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
     - data/splitted_data/X_val.csv
     - data/splitted_data/y_val.csv
-    - src/model/evaluate_model.py 
+    - src/model/evaluate_model.py
+  
+  hyperparameter_tuning_eval:
+    cmd: python3 -m src.model.hyperparameter_tuning_eval
+    deps:
+    - data/splitted_data/X_train.csv
+    - data/splitted_data/y_train.csv
+    - data/splitted_data/X_val.csv
+    - data/splitted_data/y_val.csv
+    - src/model/hyperparameter_tuning_eval.py
+    - params.yaml
     
