@@ -2,7 +2,7 @@ test_size: 0.2
 model:
   random_forest:
     n_estimators: 100
-    max_depth: 10
+    max_depth: 20
   xgboost:
     n_estimators: 150
     max_depth: 8

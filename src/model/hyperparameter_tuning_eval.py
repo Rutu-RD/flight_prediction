@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # Init DagsHub + MLflow
     dagshub.init(repo_owner="Rutu-RD", repo_name="flight_prediction", mlflow=True)
     mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
-    mlflow.set_experiment("flight_price_(RF,XGB)_tracking")
+    mlflow.set_experiment("flight_price_hyperparameter(xgb,rf)_tracking")
 
     # Load data (train + val)
     x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))

@@ -20,18 +20,9 @@ if __name__=="__main__":
    
    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
    
-   mlflow.set_experiment("flight_price_rfexperiment")
-   with mlflow.start_run(run_name="rf_model_training"):
+   mlflow.set_experiment("flight_price_random_forest_ experiment")
+   with mlflow.start_run(run_name="random_forest_model_training"):
         logger.info("training random forest regressor model")   
-
-
-
-
-
-
-
-
-
         x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
         y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
 
@@ -53,6 +44,8 @@ if __name__=="__main__":
             ('preprocessor', build_preprocessor()),
             ('model', rf)
         ])
+        mlflow.log_param("n_estimators", n_estimators)
+        mlflow.log_param("max_depth", max_depth)
 
         model_pipeline.fit(x_train, y_train)
         logger.info("model training completed")
