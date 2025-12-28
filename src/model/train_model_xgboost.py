@@ -31,7 +31,8 @@ if __name__=="__main__":
     max_depth = params['model']['xgboost']['max_depth']
     learning_rate = params['model']['xgboost']['learning_rate']
     random_state = params['model']['xgboost']['random_state']
-    
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_experiment("flight_price_train_model_xgboost_tracking")
     with mlflow.start_run(run_name="xgboost_model_tracking"):
         xgb = XGBRegressor(
             n_estimators=n_estimators,
