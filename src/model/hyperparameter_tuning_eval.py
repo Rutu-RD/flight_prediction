@@ -12,6 +12,9 @@ import mlflow.sklearn
 import dagshub
 
 from src.model.pipeline import build_preprocessor
+from dotenv import load_dotenv
+load_dotenv()
+tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
 
 logging.basicConfig(level=logging.INFO)
 console = logging.StreamHandler()
@@ -26,7 +29,7 @@ y_val = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv"))
 if __name__ == "__main__":
     # Init DagsHub + MLflow
     dagshub.init(repo_owner="Rutu-RD", repo_name="flight_prediction", mlflow=True)
-    mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("flight_price_hyperparameter_tuning_experiments")
 
     # Load data (train + val)

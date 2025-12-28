@@ -83,3 +83,11 @@ stages:
     - src/model/hyperparameter_tuning_eval.py
     - params.yaml
     
+  best_model:
+    cmd: python3 -m src.model.best_model
+    deps:
+    - src/model/hyperparameter_tuning_eval.py
+    - src/model/evaluate_model.py
+    - src.model.best_model.py
+    outs:
+    - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv

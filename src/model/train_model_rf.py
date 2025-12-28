@@ -9,7 +9,9 @@ from src.model.pipeline import build_preprocessor
 import joblib
 import mlflow
 import dagshub
-
+from dotenv import load_dotenv
+load_dotenv()
+tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
 logging.basicConfig(level=logging.INFO)
 console = logging.StreamHandler()
 logger = logging.getLogger(__name__)
@@ -18,7 +20,7 @@ logger.addHandler(console)
 if __name__=="__main__":
    dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
    
-   mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
+   mlflow.set_tracking_uri(tracking_uri)
    
    mlflow.set_experiment("flight_price_train_model_rf_tracking")
    with mlflow.start_run(run_name="random_forest_model_training"):

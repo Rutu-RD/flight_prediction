@@ -15,13 +15,15 @@ import mlflow
 import dagshub
 from src.model.train_model_rf import RandomForestRegressor
 from mlflow.sklearn import log_model
-
+from dotenv import load_dotenv
+load_dotenv()
+tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
 
 if __name__ == "__main__":
    # dagshub and mlflow initialization
    dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
    
-   mlflow.set_tracking_uri("https://dagshub.com/Rutu-RD/flight_prediction.mlflow")
+   mlflow.set_tracking_uri(tracking_uri)
    
    mlflow.set_experiment("Evaluation_of_RF_and_XGB_models(baseline_models)")
 
