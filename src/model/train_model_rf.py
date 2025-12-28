@@ -9,6 +9,8 @@ from src.model.pipeline import build_preprocessor
 import joblib
 import mlflow
 import dagshub
+import mlflow.sklearn
+from mlflow.models import infer_signature
 from dotenv import load_dotenv
 load_dotenv()
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
@@ -51,6 +53,14 @@ if __name__=="__main__":
 
         model_pipeline.fit(x_train, y_train)
         logger.info("model training completed")
+        # getting model signature and logging model to mlflow
+        signature=infer_signature(x_train.head(5), model_pipeline.predict(x_train.head(5)))
+        mlflow.sklearn.log_model(
+            sk_model=model_pipeline,
+            artifact_path="model_pipeline",
+            signature=signature)
+        logger.info("model logged to mlflow")
+      
         #mlflow.sklearn.log_model(model_pipeline, "random_forest_model")
 
         os.makedirs("models", exist_ok=True)

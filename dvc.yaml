@@ -61,7 +61,7 @@ stages:
     - params.yaml
     outs:
     - models/xgboost_model.pkl
-  
+
   evaluate_model:
     cmd: python3 -m src.model.evaluate_model
     deps:
@@ -72,7 +72,7 @@ stages:
     - data/splitted_data/X_val.csv
     - data/splitted_data/y_val.csv
     - src/model/evaluate_model.py
-  
+    
   hyperparameter_tuning_eval:
     cmd: python3 -m src.model.hyperparameter_tuning_eval
     deps:
@@ -83,11 +83,11 @@ stages:
     - src/model/hyperparameter_tuning_eval.py
     - params.yaml
     
-  best_model:
-    cmd: python3 -m src.model.best_model
-    deps:
-    - src/model/hyperparameter_tuning_eval.py
-    - src/model/evaluate_model.py
-    - src.model.best_model.py
-    outs:
-    - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
+  # best_model:
+  #   cmd: python3 -m src.model.best_model
+  #   deps:
+  #   - src/model/hyperparameter_tuning_eval.py
+  #   - src/model/evaluate_model.py
+  #   - src.model.best_model.py
+  #   outs:
+  #   - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv

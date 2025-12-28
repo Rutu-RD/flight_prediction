@@ -8,6 +8,9 @@ from yaml import safe_load
 from src.model.pipeline import build_preprocessor 
 import joblib
 import mlflow
+import dagshub
+import mlflow.sklearn
+from mlflow.models import infer_signature
 from dotenv import load_dotenv
 load_dotenv()
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
@@ -49,6 +52,9 @@ if __name__=="__main__":
         mlflow.log_param("max_depth",max_depth)
         mlflow.log_param("learning_rate",learning_rate)
         mlflow.log_param("random_state",random_state)
+        signature=infer_signature(x_train.head(10),model_pipeline.predict(x_train.head(10)))
+        mlflow.sklearn.log_model(sk_model=model_pipeline,artifact_path="model_pipeline",signature=signature)
+        
 
         logger.info("xgboost model training completed")
         os.makedirs("models", exist_ok=True)
