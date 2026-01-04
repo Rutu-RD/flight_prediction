@@ -13,20 +13,23 @@ import mlflow.sklearn
 from mlflow.models import infer_signature
 from dotenv import load_dotenv
 load_dotenv()
+import warnings
+warnings.filterwarnings("ignore")
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
+from src.logger import setup_logger
+logger = setup_logger(name="train_model_rf")
 
 if __name__=="__main__":
    dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
-   
-   mlflow.set_tracking_uri(tracking_uri)
-   
-   mlflow.set_experiment("flight_price_train_model_rf_tracking")
-   with mlflow.start_run(run_name="random_forest_model_training"):
-        logger.info("training random forest regressor model")   
+   try:
+      mlflow.set_tracking_uri(tracking_uri)
+   except Exception as e:
+      logger.error("Failed to set MLflow tracking URI")
+      raise e
+
+   mlflow.set_experiment("train_model_rf_tracking")
+   with mlflow.start_run(run_name="random_forest_model_tracking"):
+        logger.info("training random forest regressor model") 
         x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
         y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
 
@@ -48,6 +51,8 @@ if __name__=="__main__":
             ('preprocessor', build_preprocessor()),
             ('model', rf)
         ])
+        logger.info("model pipeline created")
+        logger.info(f"Logging model parameters: n_estimators={n_estimators}, max_depth={max_depth}")
         mlflow.log_param("n_estimators", n_estimators)
         mlflow.log_param("max_depth", max_depth)
 

@@ -13,14 +13,14 @@ import mlflow.sklearn
 from mlflow.models import infer_signature
 from dotenv import load_dotenv
 load_dotenv()
+import warnings
+warnings.filterwarnings("ignore")
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
+from src.logger import setup_logger
+logger = setup_logger(name="train_model_xgboost")
 
 if __name__=="__main__":
-    logger.info("flight prediction train_xgboost_tracking")
+    logger.info("train_xgboost_tracking")
     
     x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
     y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
@@ -35,7 +35,7 @@ if __name__=="__main__":
     learning_rate = params['model']['xgboost']['learning_rate']
     random_state = params['model']['xgboost']['random_state']
     mlflow.set_tracking_uri(tracking_uri)
-    mlflow.set_experiment("flight_price_train_model_xgboost_tracking")
+    mlflow.set_experiment("train_model_xgboost_tracking")
     with mlflow.start_run(run_name="xgboost_model_tracking"):
         xgb = XGBRegressor(
             n_estimators=n_estimators,
@@ -47,11 +47,13 @@ if __name__=="__main__":
             ('preprocessor', build_preprocessor()),
             ('model', xgb)
         ])
+        logger.info(" xgb model pipeline created")
         model_pipeline.fit(x_train, y_train)
         mlflow.log_param("n_estimators",n_estimators)
         mlflow.log_param("max_depth",max_depth)
         mlflow.log_param("learning_rate",learning_rate)
         mlflow.log_param("random_state",random_state)
+        logger.info("xgboost parameters logged to mlflow")
         signature=infer_signature(x_train.head(10),model_pipeline.predict(x_train.head(10)))
         mlflow.sklearn.log_model(sk_model=model_pipeline,artifact_path="model_pipeline",signature=signature)
         

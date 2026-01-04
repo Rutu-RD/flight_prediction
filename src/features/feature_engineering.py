@@ -4,13 +4,12 @@ import os
 import logging
 from sklearn.model_selection import train_test_split
 from yaml import safe_load
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
+from src.logger import setup_logger
+
+dataset_logger = setup_logger(name="data_transformation")
 
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
-    logger.info("adding new features to training dataframe")
+    dataset_logger.info("adding new features is_weekend,day_of_week to dataframe ")
     return(
         df
         #weekeday feature
@@ -25,14 +24,20 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    logger.info("feature engineering starting")
-    df=pd.read_csv(os.path.join( "data","transformed", "transformed_flight_price.csv"), parse_dates=["date_of_journey"])
+    dataset_logger.info("feature engineering starting")
+    try:
+        dataset_logger.info("reading data from transformed folder ")  
+        df=pd.read_csv(os.path.join( "data","transformed", "transformed_flight_price.csv"), parse_dates=["date_of_journey"])
+    except FileNotFoundError as e:
+        dataset_logger.error("File not found: data/transformed/transformed_flight_price.csv")
+        raise e
+   
     engineered_df=feature_engineering(df)
     
     data_path = os.path.join("data", "features")
     os.makedirs(data_path, exist_ok=True)
     engineered_df.to_csv(os.path.join("data","features","feature_engineered_flight_price.csv"), index=False)    
-    logger.info("feature engineering completed")
+    dataset_logger.info("feature engineering completed")
     
     print(df.head())
     

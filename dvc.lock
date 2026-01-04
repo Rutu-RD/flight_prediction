@@ -1,12 +1,12 @@
 schema: '2.0'
 stages:
   data_gathering:
-    cmd: python3 src/data/make_dataset.py
+    cmd: PYTHONPATH=. python3 src/data/make_dataset.py
     deps:
     - path: src/data/make_dataset.py
       hash: md5
-      md5: cb695e08506e44335e05298c9c783937
-      size: 797
+      md5: 284c5f13edce32737a4f7e6c30f10a3d
+      size: 1081
     outs:
     - path: data/raw
       hash: md5
@@ -14,7 +14,7 @@ stages:
       size: 1096473
       nfiles: 1
   data_cleaning:
-    cmd: python3 src/data/data_cleaning.py
+    cmd: PYTHONPATH=. python3 src/data/data_cleaning.py
     deps:
     - path: data/raw/flight_price.csv
       hash: md5
@@ -22,25 +22,25 @@ stages:
       size: 1096473
     - path: src/data/data_cleaning.py
       hash: md5
-      md5: a66d75733809995d297e44291a2b2436
-      size: 2889
+      md5: 1dfc5a17f5b3b4f0d0d67411168eb661
+      size: 3236
     outs:
     - path: data/interim
       hash: md5
-      md5: f5268c56ca47561b1e0f345b3b117368.dir
+      md5: 03692efc1f82e2f2cc6603370322c7f3.dir
       size: 1372946
       nfiles: 1
   data_transformation:
-    cmd: python3 src/data/data_transformation.py
+    cmd: PYTHONPATH=. python3 src/data/data_transformation.py
     deps:
     - path: data/interim/cleaned_flight_price.csv
       hash: md5
-      md5: 0eb8abcb4bb40d913070da420a7e6472
+      md5: 31714294e45d3d764cd0c4c99824ce3c
       size: 1372946
     - path: src/data/data_transformation.py
       hash: md5
-      md5: ab3c660f2752723d40cecc7748980ea6
-      size: 1560
+      md5: 2c09eff44209c6a28f9a0e68df859a62
+      size: 1822
     outs:
     - path: data/transformed
       hash: md5
@@ -48,7 +48,7 @@ stages:
       size: 911534
       nfiles: 1
   feature_engineering:
-    cmd: python3 src/features/feature_engineering.py
+    cmd: PYTHONPATH=. python3 src/features/feature_engineering.py
     deps:
     - path: data/transformed/transformed_flight_price.csv
       hash: md5
@@ -56,8 +56,8 @@ stages:
       size: 911534
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: ed638ec4770e3272f5e03481fc56a6f0
-      size: 1223
+      md5: 88ce9d80b8f99b83634cddbe85bc7246
+      size: 1452
     outs:
     - path: data/features
       hash: md5
@@ -65,7 +65,7 @@ stages:
       size: 783698
       nfiles: 1
   data_splitting:
-    cmd: python3 src/model/splitting.py
+    cmd: PYTHONPATH=. python3 src/model/splitting.py
     deps:
     - path: data/features/feature_engineered_flight_price.csv
       hash: md5
@@ -73,12 +73,12 @@ stages:
       size: 783698
     - path: params.yaml
       hash: md5
-      md5: e5948b32f30a9cd365c4ab685c676400
-      size: 424
+      md5: df82bf62ac4412d95380dc1ac691b1b1
+      size: 432
     - path: src/model/splitting.py
       hash: md5
-      md5: 1701659352b6aa3412ae99c65ad711f9
-      size: 1574
+      md5: a8528cea93e00f6fbfb1cd7a07071f17
+      size: 2038
     outs:
     - path: data/splitted_data
       hash: md5
@@ -164,10 +164,10 @@ stages:
       size: 112648
     - path: src/model/pipeline.py
       hash: md5
-      md5: db33a0e160a7caa0ffbd5bb330347923
-      size: 1322
+      md5: 03d8166e8248847a0203b4344eba0d0e
+      size: 1260
   evaluate_model:
-    cmd: python3 -m src.model.evaluate_model
+    cmd: PYTHONPATH=. python3 -m src.model.evaluate_model
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
@@ -195,8 +195,8 @@ stages:
       size: 1438021
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: e7b656c65142d2218219f28fe0846555
-      size: 4392
+      md5: 965fe83c8f9c8b39608c1397ba53e3f9
+      size: 5107
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -210,23 +210,23 @@ stages:
       size: 50620
     - path: params.yaml
       hash: md5
-      md5: e5948b32f30a9cd365c4ab685c676400
-      size: 424
+      md5: df82bf62ac4412d95380dc1ac691b1b1
+      size: 432
     - path: src/model/pipeline.py
       hash: md5
-      md5: db33a0e160a7caa0ffbd5bb330347923
-      size: 1322
+      md5: 03d8166e8248847a0203b4344eba0d0e
+      size: 1260
     - path: src/model/train_model_rf.py
       hash: md5
-      md5: f3a9b3a69e6e0aff5813941ea513a3d9
-      size: 2508
+      md5: 65d8cc4e38449cce0cd4c6de45dfc431
+      size: 2733
     outs:
     - path: models/random_forest_model.pkl
       hash: md5
       md5: e2a2049a6ac31c24838e5087dd55d3dc
       size: 34816250
   train_model_xgboost:
-    cmd: python3 -m src.model.train_model_xgboost
+    cmd: PYTHONPATH=. python3 -m src.model.train_model_xgboost
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
@@ -238,23 +238,23 @@ stages:
       size: 50620
     - path: params.yaml
       hash: md5
-      md5: e5948b32f30a9cd365c4ab685c676400
-      size: 424
+      md5: df82bf62ac4412d95380dc1ac691b1b1
+      size: 432
     - path: src/model/pipeline.py
       hash: md5
-      md5: db33a0e160a7caa0ffbd5bb330347923
-      size: 1322
+      md5: 03d8166e8248847a0203b4344eba0d0e
+      size: 1260
     - path: src/model/train_model_xgboost.py
       hash: md5
-      md5: 8b024203cb933e0224337714386806ba
-      size: 2422
+      md5: 57cf71292b0b741981f46968de1ccbb6
+      size: 2499
     outs:
     - path: models/xgboost_model.pkl
       hash: md5
       md5: 46c40d76e2ad122d6a4a5d6e31fd6ea4
       size: 1438021
   hyperparameter_tuning_eval:
-    cmd: python3 -m src.model.hyperparameter_tuning_eval
+    cmd: PYTHONPATH=. python3 -m src.model.hyperparameter_tuning_eval
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
@@ -274,21 +274,29 @@ stages:
       size: 12683
     - path: params.yaml
       hash: md5
-      md5: e5948b32f30a9cd365c4ab685c676400
-      size: 424
+      md5: df82bf62ac4412d95380dc1ac691b1b1
+      size: 432
     - path: src/model/hyperparameter_tuning_eval.py
       hash: md5
-      md5: f1b94c2c3be4c2d87f2ec6474db94261
-      size: 7171
+      md5: 7fe49a60b770f4f5fbac8b0c773786dc
+      size: 8124
   best_model:
-    cmd: python3 -m src.model.best_model
+    cmd: PYTHONPATH=. python3 -m src.model.best_model
     deps:
+    - path: src/model/best_model.py
+      hash: md5
+      md5: d7474d062723a6e411cf2218825fcef9
+      size: 4241
+    - path: src/model/evaluate_model.py
+      hash: md5
+      md5: 965fe83c8f9c8b39608c1397ba53e3f9
+      size: 5107
     - path: src/model/hyperparameter_tuning_eval.py
       hash: md5
-      md5: f6e88af5f2edbf96d28cc6c19da790be
-      size: 6626
+      md5: 7fe49a60b770f4f5fbac8b0c773786dc
+      size: 8124
     outs:
     - path: models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
       hash: md5
-      md5: e306d515e15a2f2d2e18a9bc251f003d
-      size: 142603
+      md5: 18eecfaae3ba4ccdf14ff622f069ab4b
+      size: 9810

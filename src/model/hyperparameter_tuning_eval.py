@@ -16,18 +16,20 @@ from src.model.pipeline import build_preprocessor
 from dotenv import load_dotenv
 load_dotenv()
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
-
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
-
+import warnings
+warnings.filterwarnings("ignore")
+from src.logger import setup_logger 
+logger = setup_logger(name="hyperparameter_tuning_eval")
 
 if __name__ == "__main__":
     # Init DagsHub + MLflow
     dagshub.init(repo_owner="Rutu-RD", repo_name="flight_prediction", mlflow=True)
-    mlflow.set_tracking_uri(tracking_uri)
-    mlflow.set_experiment("flight_price_hyperparameter_tuning_experiments")
+    try:
+        mlflow.set_tracking_uri(tracking_uri)
+    except Exception as e:
+        logger.error("Failed to set MLflow tracking URI")
+        raise e
+    mlflow.set_experiment("hyperparameter_tuning RF and xgboost")
 
     # Load data (train + val)
     # getting x_train, y_train, x_val, y_val from splitted data
@@ -35,23 +37,25 @@ if __name__ == "__main__":
     y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))
     x_val = pd.read_csv(os.path.join("data", "splitted_data", "X_val.csv"))
     y_val = pd.read_csv(os.path.join("data", "splitted_data", "y_val.csv"))
-
+    logger.info("train and validate splitted data loaded successfully")
     if isinstance(y_train, pd.DataFrame) and y_train.shape[1] == 1:
         y_train = y_train.iloc[:, 0]
     if isinstance(y_val, pd.DataFrame) and y_val.shape[1] == 1:
         y_val = y_val.iloc[:, 0]
 
     # Read current params (base config)
-    with open("params.yaml") as f:
-        params = safe_load(f)
+    try:
+         logger.info("reading base params from params.yaml file")
+         with open("params.yaml") as f:
+             params = safe_load(f)
+    except FileNotFoundError as e:
+         logger.error("File not found: params.yaml")
+         raise e
+    
 
-    base_n = params["model"]["random_forest"]["n_estimators"]
-    base_depth = params["model"]["random_forest"]["max_depth"]
-    logger.info(f"Base params from params.yaml -> n_estimators={base_n}, max_depth={base_depth}")
-
+    
     # Hyperparameter training parameters for random forest
-    with open("params.yaml") as f:
-        params = safe_load(f)
+   
     n_estimators_list = params["hyperparameter_models"]["random_forest"]["n_estimators"]
     depth = params["hyperparameter_models"]["random_forest"]["max_depth"]
     
@@ -62,7 +66,7 @@ if __name__ == "__main__":
         for n in n_estimators_list:
             for d in depth:
                 run_name = f"rf_n_estimators{n}_depth{d}"
-                with mlflow.start_run(run_name=run_name, nested=True):
+                with mlflow.start_run(run_name=run_name, nested=True) as child_run:
                     logger.info(f"Starting child run: {run_name}")
                     rf_hp = RandomForestRegressor(
                         n_estimators=n,
@@ -84,11 +88,12 @@ if __name__ == "__main__":
                     mlflow.log_param("n_estimators", n)
                     mlflow.log_param("max_depth", d)
                     mlflow.log_param("model_type", "RandomForestRegressor")
+                    logger.info(f"Logged parameters: n_estimators={n}, max_depth={d}")
 
                     #log model
                     signature=infer_signature(x_train.head(10),model_pipeline.predict(x_train.head(10)))
                     mlflow.sklearn.log_model(sk_model=model_pipeline,artifact_path="model_pipeline",signature=signature)
-
+                    logger.info("Model logged to mlflow")
                     # Evaluate on validation set
                     logger.info("Evaluating on validation set...")
                     y_pred = model_pipeline.predict(x_val)
@@ -103,6 +108,7 @@ if __name__ == "__main__":
                     mlflow.log_metric("MAE", mae)
                     mlflow.log_metric("MSE", mse)
                     mlflow.log_metric("R2_Score", r2)
+                    logger.info(f"Metrics logged for run: {run_name}")
 
                     
 
@@ -113,8 +119,14 @@ if __name__ == "__main__":
     with mlflow.start_run(run_name="xgb_hyperparameter_tuning") as parent_run:
         logger.info("starting parent run for xgboost")
         # load hyperparameter values from params.yaml
-        with open("params.yaml") as f:
-            params = safe_load(f)
+        try: 
+             logger.info("reading hyperparameter tuning params from params.yaml file")
+             with open("params.yaml") as f:
+                 params = safe_load(f)
+        except FileNotFoundError as e:
+             logger.error("File not found: params.yaml")
+             raise e
+        
         learning_rates = params["hyperparameter_models"]["xgboost"]["learning_rate"]
         n_estimators_list = params["hyperparameter_models"]["xgboost"]["n_estimators"]
         depths = params["hyperparameter_models"]["xgboost"]["max_depth"]
@@ -122,7 +134,7 @@ if __name__ == "__main__":
             for n in n_estimators_list:
                 for d in depths:
                     run_name=f"xgboost {lr} lr n{n} {d}d(depth)"
-                    with mlflow.start_run(run_name=run_name,nested=True):
+                    with mlflow.start_run(run_name=run_name,nested=True) as child_run:
                         logger.info(f"starting child run {run_name}")
                         xgb_hp = XGBRegressor(
                             learning_rate=lr,
@@ -143,10 +155,13 @@ if __name__ == "__main__":
                         mlflow.log_param("learning_rate",lr)
                         mlflow.log_param("n_estimators",n)
                         mlflow.log_param("max_depth",d)
+                        mlflow.log_param("model_type", "XGBRegressor")
+                        logger.info(f"logged xgboost parameters: learning_rate={lr}, n_estimators={n}, max_depth={d}")
 
                         #log model to mlflow
                         signature=infer_signature(x_train.head(10),model_pipeline.predict(x_train.head(10)))
                         mlflow.sklearn.log_model(sk_model=model_pipeline,artifact_path="model_pipeline",signature=signature)
+                        logger.info("xgboost model f{run_name} logged to mlflow".format(run_name=run_name))
                         logger.info("evaluating on validation set")
                         y_pred=model_pipeline.predict(x_val)
                         #log metrics to mlflow
@@ -157,6 +172,7 @@ if __name__ == "__main__":
                         mlflow.log_metric("MAE",mae)
                         mlflow.log_metric("MSE",mse)
                         mlflow.log_metric("R2_Score",r2)
+                        logger.info(f"xgboost metrics logged for run: {run_name}")
                         
                         # mlflow.log_param("model_type","XGBRegressor")
                         # mlflow.sklearn.log_model(

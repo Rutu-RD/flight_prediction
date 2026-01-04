@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 import os
 import logging
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
+from src.logger import setup_logger
+
+dataset_logger = setup_logger(name="data_cleaning")
 
 
-
+import warnings
+warnings.filterwarnings("ignore")
 
 # changing column names
 # changing column names
@@ -61,12 +61,20 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    logger.info("data cleaning starting")
-    df=pd.read_csv(os.path.join( "data","raw", "flight_price.csv"))
+   
+    try:
+        df=pd.read_csv(os.path.join( "data","raw", "flight_price.csv"))
+    except FileNotFoundError as e:
+        dataset_logger.error("File not found: data/raw/flight_price.csv")
+        raise e
+    dataset_logger.info("data read from raw folder")
+    dataset_logger.info("data cleaning starting")
     cleaned_df=cleaning(df)
-    cleaned_df.info()
+    #cleaned_df.info()
+    dataset_logger.info(" there are total {} rows and {} columns after cleaning".format(cleaned_df.shape[0],cleaned_df.shape[1]))
+    
     data_path = os.path.join("data", "interim")
     os.makedirs(data_path, exist_ok=True)
     cleaned_df.to_csv(os.path.join("data","interim","cleaned_flight_price.csv"))    
-    logger.info("data cleaning completed")
+    dataset_logger.info("data cleaning completed")
 

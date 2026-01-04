@@ -1,14 +1,18 @@
+import logging
 import mlflow
 import pandas as pd
 import os
 from mlflow.tracking import MlflowClient
 from dotenv import load_dotenv
 load_dotenv()
+import warnings
+warnings.filterwarnings("ignore")
 tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
-
+from src.logger import setup_logger
+logger = setup_logger(name="best_model")
 def load_children() -> pd.DataFrame:
     mlflow.set_tracking_uri(tracking_uri)
-    experiment_name = "flight_price_hyperparameter_tuning_experiments" 
+    experiment_name = "hyperparameter_tuning RF and xgboost"
     exp = mlflow.get_experiment_by_name(experiment_name)
     if exp is None:
         raise ValueError(f"Experiment {experiment_name} not found")
@@ -100,14 +104,36 @@ if __name__ == "__main__":
 
     rf_model_version = register_and_stage_model(
             run_id=best_model_df.iloc[0].run_id,
-            model_name="Random_Forest_Flight_Price_Prediction_Model",
+            model_name="rf model :" + best_model_df['tags.mlflow.runName'].iloc[0],
             stage="Staging")
+    logger.info(f"Registered Random Forest model version: {rf_model_version}")
     xgb_model_version = register_and_stage_model(
             run_id=best_model_df.iloc[1].run_id,
-            model_name="XGBoost_Flight_Price_Prediction_Model",
+            model_name="xgb model :" + best_model_df['tags.mlflow.runName'].iloc[1],
             stage="Staging")
-    print(f"Registered Random Forest model version: {rf_model_version}")
-    print(f"Registered XGBoost model version: {xgb_model_version}")
+    
+  
+    logger.info(f"Registered XGBoost model version: {xgb_model_version}")
+    logger.info("comparing best models of the registered models to use for production")
+    if best_model_df.iloc[0]['metrics.R2_Score'] > best_model_df.iloc[1]['metrics.R2_Score']:
+        best_run_id=best_model_df.iloc[0].run_id
+        logger.info("Random Forest model selected as the best model for production")
+        best_model_name = "rf model :" + best_model_df['tags.mlflow.runName'].iloc[0]
+        best_model_version = rf_model_version
+    else:
+        logger.info("XGBoost model selected as the best model for production")
+        best_run_id=best_model_df.iloc[1].run_id
+        best_model_name = "xgb model :" + best_model_df['tags.mlflow.runName'].iloc[1]
+        best_model_version = xgb_model_version
+    logger.info(f"Best model for production: {best_model_name}, version: {best_model_version}")
+   
+    best_model=register_and_stage_model(
+        run_id=best_run_id,
+        model_name="best_model_for_production",
+        stage="Production"
+    )
+    logger.info(f"Registered Best model for production version: {best_model}")
+   
 
 
     

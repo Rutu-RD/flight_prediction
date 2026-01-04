@@ -8,11 +8,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_absolute_error, mean_squared_error 
 from yaml import safe_load
-logging.basicConfig(level=logging.INFO)
-console = logging.StreamHandler()
-logger = logging.getLogger(__name__)
-logger.addHandler(console)
+from src.logger import setup_logger 
 
+logger = setup_logger(name="pipeline")
 
 
 
