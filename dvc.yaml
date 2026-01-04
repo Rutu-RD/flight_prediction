@@ -1,33 +1,33 @@
 stages:
   data_gathering:
-    cmd: PYTHONPATH=. python3 src/data/make_dataset.py
+    cmd: python3 -m src.data.make_dataset
     deps:
     - src/data/make_dataset.py
     outs:
     - data/raw
   data_cleaning:
-    cmd: PYTHONPATH=. python3 src/data/data_cleaning.py
+    cmd: python3 -m src.data.data_cleaning
     deps:
     - data/raw/flight_price.csv
     - src/data/data_cleaning.py
     outs:
     - data/interim
   data_transformation:
-    cmd: PYTHONPATH=. python3 src/data/data_transformation.py
+    cmd: python3 -m src.data.data_transformation
     deps:
     - data/interim/cleaned_flight_price.csv
     - src/data/data_transformation.py
     outs:
     - data/transformed
   feature_engineering:
-    cmd: PYTHONPATH=. python3 src/features/feature_engineering.py
+    cmd: python3 -m src.features.feature_engineering
     deps:
     - data/transformed/transformed_flight_price.csv
     - src/features/feature_engineering.py
     outs:
     - data/features
   data_splitting:
-    cmd: PYTHONPATH=. python3 src/model/splitting.py
+    cmd: python3 -m src.model.splitting
     deps:
     - data/features/feature_engineered_flight_price.csv
     - src/model/splitting.py
@@ -52,7 +52,7 @@ stages:
     outs:
     - models/random_forest_model.pkl
   train_model_xgboost:
-    cmd: PYTHONPATH=. python3 -m src.model.train_model_xgboost
+    cmd: python3 -m src.model.train_model_xgboost
     deps:
     - src/model/pipeline.py
     - data/splitted_data/X_train.csv
@@ -63,7 +63,7 @@ stages:
     - models/xgboost_model.pkl
 
   evaluate_model:
-    cmd: PYTHONPATH=. python3 -m src.model.evaluate_model
+    cmd: python3 -m src.model.evaluate_model
     deps:
     - models/random_forest_model.pkl
     - models/xgboost_model.pkl
@@ -74,7 +74,7 @@ stages:
     - src/model/evaluate_model.py
     
   hyperparameter_tuning_eval:
-    cmd: PYTHONPATH=. python3 -m src.model.hyperparameter_tuning_eval
+    cmd: python3 -m src.model.hyperparameter_tuning_eval
     deps:
     - data/splitted_data/X_train.csv
     - data/splitted_data/y_train.csv
@@ -84,7 +84,7 @@ stages:
     - params.yaml
     
   best_model:
-    cmd: PYTHONPATH=. python3 -m src.model.best_model
+    cmd: python3 -m src.model.best_model
     deps:
     - src/model/hyperparameter_tuning_eval.py
     - src/model/evaluate_model.py
