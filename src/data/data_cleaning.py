@@ -47,9 +47,10 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
         #.assign(arr_time=lambda x:pd.to_datetime(x['arr_time']).dt.time)
         .assign(arr_time=lambda x:pd.to_datetime(x['arr_time']))
         .assign(duration=lambda x:
-                x['duration'].str.extract(r'(\d+)h')[0].fillna(0).astype(int) * 60 +
-                x['duration'].str.extract(r'(\d+)m')[0].fillna(0).astype(int)
+                x['duration'].str.extract(r'(\d+)h')[0].fillna(0).astype(float) * 60 +
+                x['duration'].str.extract(r'(\d+)m')[0].fillna(0).astype(float)
                 )
+        #.assign(duration=lambda x:x['duration'].astype(float))
         .assign(additional_info=lambda x: 
                 np.where(x['airline'].isin(['jet airways business', 'vistara business','']),'business',x['additional_info']))
         .assign(additional_info= lambda x: 

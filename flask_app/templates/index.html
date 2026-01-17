@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flight Price Prediction</title>
+    </head>
+    
+    <body>
+        <h1>Welcome to the Flight Price Prediction App</h1>
+        <form action="/predict" method="POST">
+        <label for="airline">Airline</label>
+          <select id="airline" name="airline" required>
+            <option value="" selected disabled>Select airline</option>
+            <option value="air india">Air India</option>
+            <option value="indigo">Indigo</option>
+            <option value="jet airways">Jet Airways</option>
+            <option value="spicejet">SpiceJet</option>
+            <option value="multiple carriers">Multiple Carriers</option>
+            <option value="goair">GoAir</option>
+            <option value="Vistara">Vistara</option>
+            <option value="Air Asia">Air Asia</option>         
+          </select>
+        <br>
+        <label for="source_city">Source</label>
+          <select id="source_city" name="source_city" required>
+            <option value="" selected disabled>Select source</option>
+            <option value="banglore">Banglore</option>
+            <option value="kolkata">Kolkata</option>
+            <option value="delhi">Delhi</option>
+            <option value="chennai">Chennai</option>
+            <option value="mumbai">Mumbai</option>
+          </select>
+        <br>
+        <label for="destination_city">Destination</label>
+          <select id="destination_city" name="destination_city" required>
+            <option value="" selected disabled>Select destination</option>
+            <option value="new delhi">New Delhi</option>
+            <option value="banglore">Banglore</option>
+            <option value="cochin">Cochin</option>
+            <option value="kolkata">Kolkata</option>
+            <option value="delhi">Delhi</option>
+            <option value="hyderabad">Hyderabad</option>
+          </select>
+        <br>
+        <label for="stops">Total Stops</label>
+          <select id="stops" name="stops" required>
+            <option value="" selected disabled>Select total stops</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        <br>
+        <label for="journey_date">Journey Date</label>
+          <input type="date" id="journey_date" name="journey_date" required>
+        <br>
+        <label for="departure_time">Departure Time</label>
+          <input type="time" id="departure_time" name="departure_time" required>
+        <br>
+        <label for="arrival_time">Arrival Time</label>
+          <input type="time" id="arrival_time" name="arrival_time" required>
+        <br>
+        <local for=""additional_info">Additional Info</label>
+          <select id="additional_info" name="additional_info" required>
+            <option value="" selected disabled>Select additional info</option>
+            <option value="No info">No info</option>
+            <option value="In-flight meal not included">In-flight meal not included</option>
+            <option value="No check-in baggage included">No check-in baggage included</option>
+            <option value="1 Long layover">1 Long layover</option>
+            <option value="Change airports">Change airports</option>
+            <option value="Business class">Business class</option>
+            <option value="Red-eye flight">Red-eye flight</option>
+          </select>
+        <br>
+          <input type="submit" value="Predict Price">
+        </form>
+    </body>
+</html>
