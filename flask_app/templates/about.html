@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About | Flight Price Prediction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 24px;
+      color:#111;
+      line-height:1.55;
+    }
+    .container{
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    nav a{
+      margin-right: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      color:#111;
+      font-size: 14px;
+    }
+    nav a:hover{ text-decoration: underline; }
+
+    h1{
+      font-size: 28px;
+      margin: 10px 0 6px 0;
+    }
+    .subtitle{
+      font-size: 13px;
+      color:#555;
+      margin: 0 0 18px 0;
+    }
+
+    h2{
+      font-size: 20px;
+      margin: 26px 0 8px 0;
+      padding-top: 14px;
+      border-top: 1px solid #ddd;
+    }
+    p{
+      font-size: 14px;
+      color:#333;
+      margin: 0 0 10px 0;
+    }
+    ul{
+      margin: 8px 0 0 18px;
+      padding: 0;
+      font-size: 14px;
+      color:#333;
+    }
+    li{ margin-bottom: 6px; }
+
+    .stack span{
+      display:inline-block;
+      border:1px solid #ccc;
+      padding: 4px 8px;
+      margin: 4px 6px 0 0;
+      font-size: 12px;
+      color:#222;
+    }
+
+    .callout{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #e1e1e1;
+      background: #fafafa;
+      font-size: 13px;
+      color:#444;
+    }
+
+    .small{
+      font-size: 13px;
+      color:#555;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+    </nav>
+
+    <h1>Flight Price Prediction System</h1>
+    <div class="subtitle">
+      End-to-end ML system with DVC pipelines, MLflow experiment tracking + model registry, and a Flask inference app.
+    </div>
+
+    <h2>Why I Built This</h2>
+    <p>
+      This project predicts flight ticket prices using structured travel information such as airline, route, stops, journey date,
+      and departure and arrival times. The objective was not only to train a model, but to build a reproducible, production-oriented
+      ML workflow that reflects how real teams experiment, evaluate, store, and deploy models.
+    </p>
+    <ul>
+      <li>Move beyond notebook-only work to a pipeline-driven ML system with clear stages and artifacts</li>
+      <li>Practice end-to-end ML ownership: feature engineering → training → tuning → evaluation → model selection → serving</li>
+      <li>Enable transparent and auditable model comparison across experiments</li>
+      <li>Design for team collaboration by making data and model artifacts shareable and reproducible</li>
+    </ul>
+
+    <h2>How the System Works</h2>
+    <p>
+      The system is designed like a lightweight production service rather than a one-off script.
+    </p>
+    <ul>
+      <li>User submits flight details through a Flask interface</li>
+      <li>Backend runs runtime feature engineering (duration, time parts, weekday/weekend flags)</li>
+      <li>Features are assembled into a single-row DataFrame matching the training schema</li>
+      <li>Model is loaded from the MLflow Model Registry (versioned and replaceable)</li>
+      <li>Prediction is returned via a JSON response (along with input context for traceability)</li>
+    </ul>
+
+    <h2>Data, Pipeline & Artifact Management (DVC + S3)</h2>
+    <p>
+      Data and model workflows are orchestrated using DVC pipelines, with AWS S3 planned/used as a DVC remote for centralized artifact storage.
+    </p>
+    <ul>
+      <li>Implemented a multi-stage DVC pipeline covering: data gathering, cleaning, transformation, feature engineering, splitting, training, evaluation</li>
+      <li>Each stage declares explicit dependencies and outputs, enabling deterministic reruns and easier debugging</li>
+      <li>AWS S3 as a DVC remote enables versioned storage of large artifacts without bloating Git</li>
+      <li>Supports consistent retraining across machines/teams/CI by pulling the same data and feature versions</li>
+    </ul>
+
+    <h2>Modeling, Hyperparameter Tuning & Best-Model Selection</h2>
+    <p>
+      Model development focuses on consistency, systematic experimentation, and objective selection rather than ad-hoc runs.
+    </p>
+    <ul>
+      <li>Used sklearn Pipelines + ColumnTransformer to eliminate training–serving skew</li>
+      <li>Robust categorical handling with OneHotEncoder(handle_unknown="ignore")</li>
+      <li>Baseline models trained for Random Forest and XGBoost using params.yaml configuration</li>
+      <li>Hyperparameter tuning driven by YAML-defined search spaces (e.g., n_estimators, max_depth, learning_rate)</li>
+      <li>All experiments logged to MLflow Tracking (parameters, metrics, artifacts)</li>
+      <li><strong>Best-model stage</strong> traverses completed experiments, aggregates results into a DataFrame, and exports a CSV report</li>
+      <li>The CSV report can be stored locally or on AWS S3 so teams can review outcomes, reproduce decisions, and align on the best model</li>
+      <li>Selected model is registered in MLflow Model Registry for version-controlled updates and safe rollbacks</li>
+      <li>Inference schema is enforced using MLflow model signatures (input contract)</li>
+    </ul>
+
+    <h2>Toolstack</h2>
+    <p>
+      Practical, industry-aligned tools across training, tracking, governance, and serving.
+    </p>
+    <div class="stack">
+      <span>Python</span>
+      <span>pandas</span>
+      <span>NumPy</span>
+      <span>scikit-learn</span>
+      <span>Random Forest</span>
+      <span>XGBoost</span>
+      <span>DVC Pipelines</span>
+      <span>AWS S3 (DVC Remote)</span>
+      <span>YAML (params.yaml)</span>
+      <span>MLflow Tracking</span>
+      <span>MLflow Model Registry</span>
+      <span>DagsHub</span>
+      <span>Flask</span>
+      <span>dotenv</span>
+      <span>Structured Logging</span>
+    </div>
+
+    <h2>What I’m Adding Next</h2>
+    <p>
+      Next steps focus on production hardening and deployment readiness.
+    </p>
+    <ul>
+      <li>Dockerization for reproducible training and serving environments</li>
+      <li>CI pipeline for linting, testing, and container image builds</li>
+      <li>Deployment on AWS EC2 with environment-based configuration</li>
+      <li>Health endpoint + basic monitoring for reliability</li>
+      <li>Stage-based model loading (Staging → Production) with rollback support</li>
+    </ul>
+
+    <p class="small" style="margin-top:14px;">
+      If you’d like, I can walk through the DVC pipeline stages, MLflow experiment history, best-model selection report, and how I would deploy and monitor this on EC2.
+    </p>
+
+  </div>
+</body>
+</html>

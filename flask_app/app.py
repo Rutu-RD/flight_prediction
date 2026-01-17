@@ -12,7 +12,7 @@ import mlflow
 import mlflow.pyfunc
 from sklearn.pipeline import Pipeline
 from dotenv import load_dotenv
-
+from datetime import datetime
 from src.logger import setup_logger
 logger = setup_logger(name="flask_app")
 load_dotenv()
@@ -23,8 +23,6 @@ app= Flask(__name__)
 
 def feature_engineering(airline,source_city,destination_city,travel_date,dep_time,arrival_time,total_stops,additional_info):
     
-    from datetime import datetime
-
     # Convert travel_date to datetime object
     travel_date = datetime.strptime(travel_date, '%Y-%m-%d')
     dep_time = datetime.strptime(dep_time, '%H:%M')
@@ -47,6 +45,7 @@ def feature_engineering(airline,source_city,destination_city,travel_date,dep_tim
     flight_month = int(travel_date.month)
     day_of_week = int(travel_date.weekday())
     is_weekend = int(1 if day_of_week >= 5 else 0)
+    logger.info("converting input data to a single row test_dataframe")
     features = {
         'airline': airline,
         'source_city': source_city,
@@ -65,27 +64,37 @@ def feature_engineering(airline,source_city,destination_city,travel_date,dep_tim
 
           }
     prediction_df=pd.DataFrame([features])
-    print("Feature engineered DataFrame:")
-    print(prediction_df)
+    logger.info("Feature engineered DataFrame:")
+    logger.info(prediction_df)
     return prediction_df
     
 
-
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-    
-@app.route('/predict',methods=['POST'])
-def predict():
+def get_model():
     tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
 
     mlflow.set_tracking_uri(tracking_uri)
     model = mlflow.pyfunc.load_model(
     "models:/best_model_for_production/3"
     )
+    logger.info("Model loaded successfully from MLflow Model Registry")
+    return model
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html') 
+
+@app.route('/predict',methods=['POST'])
+def predict():
+    
     logger.info("Model loaded from MLflow Model Registry")
+
+    # getting input from the form
+    
     airline=request.form.get('airline')
     source_city=request.form.get('source_city')
     destination_city=request.form.get('destination_city')
@@ -94,17 +103,17 @@ def predict():
     arrival_time=request.form.get('arrival_time')
     total_stops=request.form.get('stops')
     additional_info=request.form.get('additional_info')
-
+    # feature engineering
+    logger.info("starting feature engineering for prediction data")
     features=feature_engineering(airline,source_city,destination_city,travel_date,dep_time,arrival_time,total_stops,additional_info)
-   
-
     prediction=model.predict(features)
     dict_features=features.to_dict(orient='records')[0]|{'prediction_price': prediction[0]}
 
     #prediction=prediction['airline','source_city','destination_city','duration','total_stops','additional_info','arrival_hr','arrival_min','flight_day','flight_month','dep_hr','dep_min','day_of_week','is_weekend']
     return jsonify(dict_features)
+
+
+
 if __name__=="__main__":
-  
-
-
+    model=get_model()
     app.run(debug=True)
