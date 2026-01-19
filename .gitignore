@@ -95,3 +95,4 @@ models
 
 .env
 DotEnv
+.dockerignore

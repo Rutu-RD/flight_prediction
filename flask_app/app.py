@@ -5,21 +5,27 @@ import numpy as np
 import joblib
 import os
 from sklearn.pipeline import Pipeline
-import pandas as pd
-import numpy as np
-import os
 import mlflow
 import mlflow.pyfunc
 from sklearn.pipeline import Pipeline
 from dotenv import load_dotenv
 from datetime import datetime
-from src.logger import setup_logger
-logger = setup_logger(name="flask_app")
+#from src.logger import setup_logger
+#logger = setup_logger(name="flask_app")
 load_dotenv()
 
 
 
 app= Flask(__name__)
+
+def get_credentials():
+    mlflow_username=os.getenv("MLFLOW_TRACKING_USERNAME")
+    mlflow_password=os.getenv("MLFLOW_TRACKING_PASSWORD")
+    tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+    if mlflow_username is None or mlflow_password is None:
+        #logger.error("MLflow tracking credentials are not set in environment variables.")
+        return False
+    return tracking_uri
 
 def feature_engineering(airline,source_city,destination_city,travel_date,dep_time,arrival_time,total_stops,additional_info):
     
@@ -45,7 +51,7 @@ def feature_engineering(airline,source_city,destination_city,travel_date,dep_tim
     flight_month = int(travel_date.month)
     day_of_week = int(travel_date.weekday())
     is_weekend = int(1 if day_of_week >= 5 else 0)
-    logger.info("converting input data to a single row test_dataframe")
+    #logger.info("converting input data to a single row test_dataframe")
     features = {
         'airline': airline,
         'source_city': source_city,
@@ -64,19 +70,17 @@ def feature_engineering(airline,source_city,destination_city,travel_date,dep_tim
 
           }
     prediction_df=pd.DataFrame([features])
-    logger.info("Feature engineered DataFrame:")
-    logger.info(prediction_df)
+    #logger.info("Feature engineered DataFrame:")
+   # logger.info(prediction_df)
     return prediction_df
     
 
-def get_model():
-    tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
-
+def get_model(tracking_uri):
     mlflow.set_tracking_uri(tracking_uri)
     model = mlflow.pyfunc.load_model(
     "models:/best_model_for_production/3"
     )
-    logger.info("Model loaded successfully from MLflow Model Registry")
+    #logger.info("Model loaded successfully from MLflow Model Registry")
     return model
 
 @app.route('/')
@@ -91,7 +95,7 @@ def about():
 @app.route('/predict',methods=['POST'])
 def predict():
     
-    logger.info("Model loaded from MLflow Model Registry")
+   # logger.info("Model loaded from MLflow Model Registry")
 
     # getting input from the form
     
@@ -104,16 +108,18 @@ def predict():
     total_stops=request.form.get('stops')
     additional_info=request.form.get('additional_info')
     # feature engineering
-    logger.info("starting feature engineering for prediction data")
+    # logger.info("starting feature engineering for prediction data")
     features=feature_engineering(airline,source_city,destination_city,travel_date,dep_time,arrival_time,total_stops,additional_info)
     prediction=model.predict(features)
     dict_features=features.to_dict(orient='records')[0]|{'prediction_price': prediction[0]}
 
     #prediction=prediction['airline','source_city','destination_city','duration','total_stops','additional_info','arrival_hr','arrival_min','flight_day','flight_month','dep_hr','dep_min','day_of_week','is_weekend']
-    return jsonify(dict_features)
+    return jsonify({"prediction": prediction[0]})
 
 
 
 if __name__=="__main__":
-    model=get_model()
-    app.run(debug=True)
+    tracking_uri=get_credentials()
+    model=get_model(tracking_uri)
+
+    app.run(debug=True,host='0.0.0.0',port=5000)

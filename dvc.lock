@@ -73,8 +73,8 @@ stages:
       size: 805062
     - path: params.yaml
       hash: md5
-      md5: df82bf62ac4412d95380dc1ac691b1b1
-      size: 432
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/splitting.py
       hash: md5
       md5: a8528cea93e00f6fbfb1cd7a07071f17
@@ -187,16 +187,20 @@ stages:
       size: 12683
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: e2a2049a6ac31c24838e5087dd55d3dc
-      size: 34816250
+      md5: 7a2d5c5a630ebfac521b55813b5520be
+      size: 69522074
     - path: models/xgboost_model.pkl
       hash: md5
-      md5: 46c40d76e2ad122d6a4a5d6e31fd6ea4
-      size: 1438021
+      md5: 85f0f2c7321d68620def3df17467b613
+      size: 2005005
+    - path: params.yaml
+      hash: md5
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: 965fe83c8f9c8b39608c1397ba53e3f9
-      size: 5107
+      md5: d5b69b69fca619df3e16706e25510b9f
+      size: 5405
   train_model_rf:
     cmd: python3 -m src.model.train_model_rf
     deps:
@@ -210,21 +214,21 @@ stages:
       size: 50620
     - path: params.yaml
       hash: md5
-      md5: df82bf62ac4412d95380dc1ac691b1b1
-      size: 432
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/pipeline.py
       hash: md5
       md5: 03d8166e8248847a0203b4344eba0d0e
       size: 1260
     - path: src/model/train_model_rf.py
       hash: md5
-      md5: 65d8cc4e38449cce0cd4c6de45dfc431
-      size: 2733
+      md5: d2789532d5e192d7f8faf043393b98d4
+      size: 3117
     outs:
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: e2a2049a6ac31c24838e5087dd55d3dc
-      size: 34816250
+      md5: 7a2d5c5a630ebfac521b55813b5520be
+      size: 69522074
   train_model_xgboost:
     cmd: python3 -m src.model.train_model_xgboost
     deps:
@@ -238,21 +242,21 @@ stages:
       size: 50620
     - path: params.yaml
       hash: md5
-      md5: df82bf62ac4412d95380dc1ac691b1b1
-      size: 432
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/pipeline.py
       hash: md5
       md5: 03d8166e8248847a0203b4344eba0d0e
       size: 1260
     - path: src/model/train_model_xgboost.py
       hash: md5
-      md5: 57cf71292b0b741981f46968de1ccbb6
-      size: 2499
+      md5: ddb61456ff4a621dff7571db5f5e4166
+      size: 2884
     outs:
     - path: models/xgboost_model.pkl
       hash: md5
-      md5: 46c40d76e2ad122d6a4a5d6e31fd6ea4
-      size: 1438021
+      md5: 85f0f2c7321d68620def3df17467b613
+      size: 2005005
   hyperparameter_tuning_eval:
     cmd: python3 -m src.model.hyperparameter_tuning_eval
     deps:
@@ -274,29 +278,33 @@ stages:
       size: 12683
     - path: params.yaml
       hash: md5
-      md5: df82bf62ac4412d95380dc1ac691b1b1
-      size: 432
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/hyperparameter_tuning_eval.py
       hash: md5
-      md5: 7fe49a60b770f4f5fbac8b0c773786dc
-      size: 8124
+      md5: 246dac252de9b0f9147b1dbf3dabcab9
+      size: 8428
   best_model:
     cmd: python3 -m src.model.best_model
     deps:
+    - path: params.yaml
+      hash: md5
+      md5: 8e91982bc77edddc40ee0d5be77f060b
+      size: 392
     - path: src/model/best_model.py
       hash: md5
-      md5: 4f7a17451e343a29be0aa93d28eaa288
-      size: 5295
+      md5: 7b2f6edf748c243c07cd6d1af2d6fb3c
+      size: 5752
     - path: src/model/evaluate_model.py
       hash: md5
-      md5: 965fe83c8f9c8b39608c1397ba53e3f9
-      size: 5107
+      md5: d5b69b69fca619df3e16706e25510b9f
+      size: 5405
     - path: src/model/hyperparameter_tuning_eval.py
       hash: md5
-      md5: 7fe49a60b770f4f5fbac8b0c773786dc
-      size: 8124
+      md5: 246dac252de9b0f9147b1dbf3dabcab9
+      size: 8428
     outs:
     - path: models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
       hash: md5
-      md5: d7ee29b0b4c7412f8481a7f7f4855948
-      size: 415247
+      md5: 2d17ef0011742433da145773c8dac051
+      size: 829289

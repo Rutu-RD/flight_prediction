@@ -15,13 +15,24 @@ from dotenv import load_dotenv
 load_dotenv()
 import warnings
 warnings.filterwarnings("ignore")
-tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+
+
 from src.logger import setup_logger
 logger = setup_logger(name="train_model_rf")
 
+def check_credentials():
+    mlflow_username=os.getenv("MLFLOW_TRACKING_USERNAME")
+    mlflow_password=os.getenv("MLFLOW_TRACKING_PASSWORD")
+    tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+    if mlflow_username is None or mlflow_password is None:
+        logger.error("MLflow tracking credentials are not set in environment variables.")
+        return False
+    return tracking_uri
+
 if __name__=="__main__":
-   dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
+   #dagshub.init(repo_owner='Rutu-RD', repo_name='flight_prediction', mlflow=True)
    try:
+      tracking_uri = check_credentials()
       mlflow.set_tracking_uri(tracking_uri)
    except Exception as e:
       logger.error("Failed to set MLflow tracking URI")

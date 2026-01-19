@@ -15,15 +15,24 @@ from mlflow.models import infer_signature
 from src.model.pipeline import build_preprocessor
 from dotenv import load_dotenv
 load_dotenv()
-tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+
+def check_credentials():
+    mlflow_username=os.getenv("MLFLOW_TRACKING_USERNAME")
+    mlflow_password=os.getenv("MLFLOW_TRACKING_PASSWORD")
+    tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+    if mlflow_username is None or mlflow_password is None:
+        logger.error("MLflow tracking credentials are not set in environment variables.")
+        return False
+    return tracking_uri
 import warnings
 warnings.filterwarnings("ignore")
 from src.logger import setup_logger 
 logger = setup_logger(name="hyperparameter_tuning_eval")
 
 if __name__ == "__main__":
-    # Init DagsHub + MLflow
-    dagshub.init(repo_owner="Rutu-RD", repo_name="flight_prediction", mlflow=True)
+    
+    tracking_uri = check_credentials()
+     # Set MLflow tracking URI
     try:
         mlflow.set_tracking_uri(tracking_uri)
     except Exception as e:

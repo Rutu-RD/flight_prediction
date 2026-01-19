@@ -15,12 +15,23 @@ from dotenv import load_dotenv
 load_dotenv()
 import warnings
 warnings.filterwarnings("ignore")
-tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+
 from src.logger import setup_logger
 logger = setup_logger(name="train_model_xgboost")
 
+def check_credentials():
+    mlflow_username=os.getenv("MLFLOW_TRACKING_USERNAME")
+    mlflow_password=os.getenv("MLFLOW_TRACKING_PASSWORD")
+    tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
+    if mlflow_username is None or mlflow_password is None:
+        logger.error("MLflow tracking credentials are not set in environment variables.")
+        return False
+    return tracking_uri
+
 if __name__=="__main__":
     logger.info("train_xgboost_tracking")
+    tracking_uri = check_credentials()
+    
     
     x_train = pd.read_csv(os.path.join("data", "splitted_data", "X_train.csv"))
     y_train = pd.read_csv(os.path.join("data", "splitted_data", "y_train.csv"))

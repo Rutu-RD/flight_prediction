@@ -72,6 +72,7 @@ stages:
     - data/splitted_data/X_val.csv
     - data/splitted_data/y_val.csv
     - src/model/evaluate_model.py
+    - params.yaml
     
   hyperparameter_tuning_eval:
     cmd: python3 -m src.model.hyperparameter_tuning_eval
@@ -89,5 +90,7 @@ stages:
     - src/model/hyperparameter_tuning_eval.py
     - src/model/evaluate_model.py
     - src/model/best_model.py
+    - params.yaml
     outs:
     - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
+
