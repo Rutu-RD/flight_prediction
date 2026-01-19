@@ -1,7 +1,7 @@
 test_size: 0.2
 model:
   random_forest:
-    n_estimators: 200
+    n_estimators: 250
     max_depth: 20
   xgboost:
     n_estimators: 200
@@ -10,9 +10,9 @@ model:
     learning_rate: 0.2
 hyperparameter_models:
   random_forest:
-    n_estimators: [100, 200, 300]
-    max_depth: [5, 10, 15, 20]
+    n_estimators: [100, 200]
+    max_depth: [10, 15, 20]
   xgboost:
-    n_estimators: [100, 200, 300]
-    max_depth: [5, 10, 15, 20, 25]
-    learning_rate: [0.2, 0.3, 0.4]
+    n_estimators: [100, 200]
+    max_depth: [10, 15, 20, 25]
+    learning_rate: [0.2, 0.3]
