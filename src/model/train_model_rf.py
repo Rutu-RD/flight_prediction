@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import warnings
 warnings.filterwarnings("ignore")
+from sklearn.model_selection import KFold,cross_val_score
 
 
 from src.logger import setup_logger
@@ -62,6 +63,15 @@ if __name__=="__main__":
             ('preprocessor', build_preprocessor()),
             ('model', rf)
         ])
+
+        cv=KFold(n_splits=10, shuffle=True, random_state=42)
+        mlflow.log_param("kfolds", cv.n_splits)
+
+        scores=cross_val_score(model_pipeline, x_train, y_train, cv=cv, scoring='neg_mean_absolute_error')
+        mean_score=np.mean(scores)
+        logger.info(f"Cross-validated MAE: {-mean_score}")
+        mlflow.log_metric("cv_neg_mean_absolute_error", mean_score)
+
         logger.info("model pipeline created")
         logger.info(f"Logging model parameters: n_estimators={n_estimators}, max_depth={max_depth}")
         mlflow.log_param("n_estimators", n_estimators)

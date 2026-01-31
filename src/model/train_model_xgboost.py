@@ -14,6 +14,7 @@ from mlflow.models import infer_signature
 from dotenv import load_dotenv
 load_dotenv()
 import warnings
+from sklearn.model_selection import KFold,cross_val_score
 warnings.filterwarnings("ignore")
 
 from src.logger import setup_logger
@@ -59,6 +60,16 @@ if __name__=="__main__":
             ('model', xgb)
         ])
         logger.info(" xgb model pipeline created")
+
+        cv=KFold(n_splits=10, shuffle=True,random_state=42)
+        scores=cross_val_score(model_pipeline, x_train, y_train, cv=cv, scoring='neg_mean_absolute_error')
+        mean_score=np.mean(scores)
+        logger.info(f"Cross-validated MAE: {-mean_score}")
+        mlflow.log_param("kfolds", cv.n_splits)
+        mlflow.log_metric("cv_neg_mean_absolute_error", mean_score)
+
+
+
         model_pipeline.fit(x_train, y_train)
         mlflow.log_param("n_estimators",n_estimators)
         mlflow.log_param("max_depth",max_depth)
