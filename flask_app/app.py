@@ -78,7 +78,7 @@ def feature_engineering(airline,source_city,destination_city,travel_date,dep_tim
 def get_model(tracking_uri):
     mlflow.set_tracking_uri(tracking_uri)
     model = mlflow.pyfunc.load_model(
-    "models:/best_model_for_production/3"
+    "models:/best_model_for_production/Production"
     )
     #logger.info("Model loaded successfully from MLflow Model Registry")
     return model
