@@ -41,7 +41,8 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:
        
         .drop(columns=['Airline','Source','Destination','Route','Date_of_Journey', 'Dep_Time',
        'Arrival_Time', 'Duration', 'Total_Stops', 'Additional_Info'])
-     
+       
+        .drop(index=9039)
         .assign(date_of_journey=lambda x :pd.to_datetime(x['date_of_journey']))
         .assign(arr_time=lambda x : x.loc[:,'arr_time'].str.split().str.get(0))
         #.assign(arr_time=lambda x:pd.to_datetime(x['arr_time']).dt.time)
