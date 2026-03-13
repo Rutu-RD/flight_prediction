@@ -1,10 +1,10 @@
 test_size: 0.2
 model:
   random_forest:
-    n_estimators: 250
+    n_estimators: 100
     max_depth: 20
   xgboost:
-    n_estimators: 200
+    n_estimators: 100
     max_depth: 8
     random_state: 42
     learning_rate: 0.2
@@ -16,3 +16,10 @@ hyperparameter_models:
     n_estimators: [100, 200]
     max_depth: [10, 15, 20, 25]
     learning_rate: [0.2, 0.3]
+baseline_models:
+  RidgeRegression:
+    alpha: [1,2,3,4]
+  LassoRegression:
+    alpha: [0.1,0.2,0.3,0.4]
+  LinearRegression:
+    alpha: [0]

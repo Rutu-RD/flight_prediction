@@ -15,21 +15,21 @@ stages:
   data_transformation:
     cmd: python3 -m src.data.data_transformation
     deps:
-    - data/interim/cleaned_flight_price.csv
+    - data/interim/
     - src/data/data_transformation.py
     outs:
     - data/transformed
   feature_engineering:
     cmd: python3 -m src.features.feature_engineering
     deps:
-    - data/transformed/transformed_flight_price.csv
+    - data/transformed
     - src/features/feature_engineering.py
     outs:
     - data/features
   data_splitting:
     cmd: python3 -m src.model.splitting
     deps:
-    - data/features/feature_engineered_flight_price.csv
+    - data/features
     - src/model/splitting.py
     - params.yaml
     outs:
@@ -74,23 +74,23 @@ stages:
     - src/model/evaluate_model.py
     - params.yaml
     
-  hyperparameter_tuning_eval:
-    cmd: python3 -m src.model.hyperparameter_tuning_eval
-    deps:
-    - data/splitted_data/X_train.csv
-    - data/splitted_data/y_train.csv
-    - data/splitted_data/X_val.csv
-    - data/splitted_data/y_val.csv
-    - src/model/hyperparameter_tuning_eval.py
-    - params.yaml
+  # hyperparameter_tuning_eval:
+  #   cmd: python3 -m src.model.hyperparameter_tuning_eval
+  #   deps:
+  #   - data/splitted_data/X_train.csv
+  #   - data/splitted_data/y_train.csv
+  #   - data/splitted_data/X_val.csv
+  #   - data/splitted_data/y_val.csv
+  #   - src/model/hyperparameter_tuning_eval.py
+  #   - params.yaml
     
-  best_model:
-    cmd: python3 -m src.model.best_model
-    deps:
-    - src/model/hyperparameter_tuning_eval.py
-    - src/model/evaluate_model.py
-    - src/model/best_model.py
-    - params.yaml
-    outs:
-    - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
+  # best_model:
+  #   cmd: python3 -m src.model.best_model
+  #   deps:
+  #   - src/model/hyperparameter_tuning_eval.py
+  #   - src/model/evaluate_model.py
+  #   - src/model/best_model.py
+  #   - params.yaml
+  #   outs:
+  #   - models/reports/experiments_run_df/hyperparameter_tuning_runs.csv
 

@@ -22,21 +22,22 @@ stages:
       size: 1096473
     - path: src/data/data_cleaning.py
       hash: md5
-      md5: 6926f1d04feac8cde7c6d78d57a1ec76
-      size: 3304
+      md5: 18d313ff5c699e713ac8ad2b135f48ee
+      size: 3332
     outs:
     - path: data/interim
       hash: md5
-      md5: 4f3523872d37c24bd6eea539e8a5757b.dir
-      size: 1394312
+      md5: 68e6ab201383f870261d7457a85e2da1.dir
+      size: 1394209
       nfiles: 1
   data_transformation:
     cmd: python3 -m src.data.data_transformation
     deps:
-    - path: data/interim/cleaned_flight_price.csv
+    - path: data/interim/
       hash: md5
-      md5: 4f55847d6c8705d591267dede623f32f
-      size: 1394312
+      md5: 68e6ab201383f870261d7457a85e2da1.dir
+      size: 1394209
+      nfiles: 1
     - path: src/data/data_transformation.py
       hash: md5
       md5: 2c09eff44209c6a28f9a0e68df859a62
@@ -44,16 +45,17 @@ stages:
     outs:
     - path: data/transformed
       hash: md5
-      md5: 75edda8d1881e36efe59e0a72074d1b9.dir
-      size: 932900
+      md5: b85fe54bec00100db3fe96d5a07911cd.dir
+      size: 932824
       nfiles: 1
   feature_engineering:
     cmd: python3 -m src.features.feature_engineering
     deps:
-    - path: data/transformed/transformed_flight_price.csv
+    - path: data/transformed
       hash: md5
-      md5: ee7b568b548c4217ae8f4e4719a433a2
-      size: 932900
+      md5: b85fe54bec00100db3fe96d5a07911cd.dir
+      size: 932824
+      nfiles: 1
     - path: src/features/feature_engineering.py
       hash: md5
       md5: 88ce9d80b8f99b83634cddbe85bc7246
@@ -61,19 +63,20 @@ stages:
     outs:
     - path: data/features
       hash: md5
-      md5: f19aa9e9a16703aca38f6bd5fe677ae6.dir
-      size: 805062
+      md5: 603583105e73eb39fa7e399c99a3c86d.dir
+      size: 804998
       nfiles: 1
   data_splitting:
     cmd: python3 -m src.model.splitting
     deps:
-    - path: data/features/feature_engineered_flight_price.csv
+    - path: data/features
       hash: md5
-      md5: 712e9f666556a8b33238203b0f5d94a5
-      size: 805062
+      md5: 603583105e73eb39fa7e399c99a3c86d.dir
+      size: 804998
+      nfiles: 1
     - path: params.yaml
       hash: md5
-      md5: 6d4535b8e0be9542d51cfa6e9c51ba7b
+      md5: 389b1b600b17ca70902d4a32fe88c151
       size: 375
     - path: src/model/splitting.py
       hash: md5
@@ -82,8 +85,8 @@ stages:
     outs:
     - path: data/splitted_data
       hash: md5
-      md5: 9a786dfc45c84123bd1df81fe6c6da02.dir
-      size: 805392
+      md5: cc1ab9bd4aa951041a240b88033a0285.dir
+      size: 805328
       nfiles: 6
   feature_encoding:
     cmd: python3 src/model/encoding_features.py
@@ -152,16 +155,16 @@ stages:
     deps:
     - path: data/splitted_data/X_test.csv
       hash: md5
-      md5: 65f9f4ee6591ecfa4fc32c8674b75d71
-      size: 146025
+      md5: ce49550e858ecfe0a2a227cf70b399dc
+      size: 146014
     - path: data/splitted_data/X_train.csv
       hash: md5
-      md5: 21359c206d458e5da07612323ec01eed
-      size: 464139
+      md5: f7112b67c270a887fdb2838ad68e83f2
+      size: 464789
     - path: data/splitted_data/X_val.csv
       hash: md5
-      md5: b24cec9e1aa734372897389483a7797c
-      size: 116066
+      md5: b3166b34a7ad12a110092e77c0a9ef3f
+      size: 115370
     - path: src/model/pipeline.py
       hash: md5
       md5: 03d8166e8248847a0203b4344eba0d0e
@@ -171,31 +174,31 @@ stages:
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
-      md5: 21359c206d458e5da07612323ec01eed
-      size: 464139
+      md5: f7112b67c270a887fdb2838ad68e83f2
+      size: 464789
     - path: data/splitted_data/X_val.csv
       hash: md5
-      md5: b24cec9e1aa734372897389483a7797c
-      size: 116066
+      md5: b3166b34a7ad12a110092e77c0a9ef3f
+      size: 115370
     - path: data/splitted_data/y_train.csv
       hash: md5
-      md5: fde8d9bb50504cc0a8ae15200cc87594
-      size: 50620
+      md5: fe30cb5565f82e02e205030d8f30bf96
+      size: 50668
     - path: data/splitted_data/y_val.csv
       hash: md5
-      md5: 5b78c512da5945930cda202bc37805f2
-      size: 12683
+      md5: db1a9cbfca01ce3219d92cacafaade7b
+      size: 12651
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: ac257a68e1c5f962da13583a95c37c11
-      size: 86848058
+      md5: a5f31740abdd4f66d977cee8d4bba6d2
+      size: 34854778
     - path: models/xgboost_model.pkl
       hash: md5
-      md5: 85f0f2c7321d68620def3df17467b613
-      size: 2005005
+      md5: 61861dbca9c2f05a64d15f08b6954f7c
+      size: 873062
     - path: params.yaml
       hash: md5
-      md5: 6d4535b8e0be9542d51cfa6e9c51ba7b
+      md5: 389b1b600b17ca70902d4a32fe88c151
       size: 375
     - path: src/model/evaluate_model.py
       hash: md5
@@ -206,15 +209,15 @@ stages:
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
-      md5: 21359c206d458e5da07612323ec01eed
-      size: 464139
+      md5: f7112b67c270a887fdb2838ad68e83f2
+      size: 464789
     - path: data/splitted_data/y_train.csv
       hash: md5
-      md5: fde8d9bb50504cc0a8ae15200cc87594
-      size: 50620
+      md5: fe30cb5565f82e02e205030d8f30bf96
+      size: 50668
     - path: params.yaml
       hash: md5
-      md5: 6d4535b8e0be9542d51cfa6e9c51ba7b
+      md5: 389b1b600b17ca70902d4a32fe88c151
       size: 375
     - path: src/model/pipeline.py
       hash: md5
@@ -227,22 +230,22 @@ stages:
     outs:
     - path: models/random_forest_model.pkl
       hash: md5
-      md5: ac257a68e1c5f962da13583a95c37c11
-      size: 86848058
+      md5: a5f31740abdd4f66d977cee8d4bba6d2
+      size: 34854778
   train_model_xgboost:
     cmd: python3 -m src.model.train_model_xgboost
     deps:
     - path: data/splitted_data/X_train.csv
       hash: md5
-      md5: 21359c206d458e5da07612323ec01eed
-      size: 464139
+      md5: f7112b67c270a887fdb2838ad68e83f2
+      size: 464789
     - path: data/splitted_data/y_train.csv
       hash: md5
-      md5: fde8d9bb50504cc0a8ae15200cc87594
-      size: 50620
+      md5: fe30cb5565f82e02e205030d8f30bf96
+      size: 50668
     - path: params.yaml
       hash: md5
-      md5: 6d4535b8e0be9542d51cfa6e9c51ba7b
+      md5: 389b1b600b17ca70902d4a32fe88c151
       size: 375
     - path: src/model/pipeline.py
       hash: md5
@@ -255,8 +258,8 @@ stages:
     outs:
     - path: models/xgboost_model.pkl
       hash: md5
-      md5: 85f0f2c7321d68620def3df17467b613
-      size: 2005005
+      md5: 61861dbca9c2f05a64d15f08b6954f7c
+      size: 873062
   hyperparameter_tuning_eval:
     cmd: python3 -m src.model.hyperparameter_tuning_eval
     deps:
