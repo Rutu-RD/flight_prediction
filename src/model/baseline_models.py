@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression,Ridge,Lasso
 from xgboost import XGBRegressor
 from sklearn.model_selection import KFold,cross_val_score
+from sklearn.metrics import root_mean_squared_error,mean_absolute_error,r2_score
 
 from yaml import safe_load
 from src.model.pipeline import build_preprocessor
@@ -57,74 +58,82 @@ def get_data():
 
 
 
-def Implement_Model(model_name):
+def Implement_Model(model_name: str, alphas: float) ->Pipeline:
     logger.info("implementing model:{}".format(model_name))
-    if model_name=="linearRegression":
-        Lr=LinearRegression()
-        model_pipeline= Pipeline(steps=[
-        ('preprocessor', build_preprocessor()),
-        ('model',Lr)
-        ])
-    elif model_name=="RidgeRegression":
-        RR=Ridge(alpha=1)
-        model_pipeline= Pipeline(steps=[
-        ('preprocessor', build_preprocessor()),
-        ('model',RR)
-        ])
-    elif model_name=="LassoRegression":
-        LasR=Lasso(alpha=0.1)
-        model_pipeline= Pipeline(steps=[
-        ('preprocessor', build_preprocessor()),
-        ('model',LasR)
-        ])
+    if model_name == "LinearRegression":
+        model = LinearRegression()
+    elif model_name == "RidgeRegression":
+        model = Ridge(alpha=alphas)
+    elif model_name == "LassoRegression":
+        model = Lasso(alpha=alphas)
+    else:
+        raise ValueError(f"Unsupported model_name: {model_name}")
+
+    model_pipeline = Pipeline(
+        steps=[
+            ("preprocessor", build_preprocessor()),
+            ("model", model),
+        ]
+    )
+    
 
     logger.info("made model {}".format(model_name))
-    return(model_pipeline,model_name)
+    return(model_pipeline)
 
-# def Implement_LinearRegression():
-#     logger.info("implementing linear regression")
-#     Lr=LinearRegression()
-#     model_name="LinearRegression"
-#     model_pipeline= Pipeline(steps=[
-#         ('preprocessor', build_preprocessor()),
-#         ('model',Lr)
-#     ])
-#     return(model_pipeline,model_name)
-# def Implement_RidgeRegression():
-#     logger.inof("implementing Ridge Regression")
-#     RR=Ridge(alpha=0.1)
-#     model_name="RidgeRegression"
-#     model_pipeline
-def model_evaluation(model_name,model_pipeline,X_train,y_train,X_test,y_test,X_val,y_val):
+
+def model_evaluation(model_name,X_train,y_train,X_test,y_test,X_val,y_val):
     #fitting the model
     logger.info("fitting the model")
     with open("params.yaml") as f:
        params=safe_load(f)
     mlflow.set_experiment("Multiple Baseline Model Evaluations")
     if model_name=="RidgeRegression":
-        alpha=params['baseline_models']['RidgeRegression']['alpha']
+        alpha_list=params['baseline_models']['RidgeRegression']['alpha']
     elif model_name=="LassoRegression":
-        alpha=params['baseline_models']['LassoRegression']['alpha']
+        alpha_list=params['baseline_models']['LassoRegression']['alpha']
     else:
-        alpha=params['baseline_models']['LinearRegression']['alpha']
+        alpha_list=params['baseline_models']['LinearRegression']['alpha']
 
     with mlflow.start_run(run_name=f"model_evaluation_{model_name}") as parent_run:
-        for alphas in alpha:
-            run_name=f"model_evaluation_{model_name}_alpha:{alphas}"
+        for alpha in alpha_list:
+            run_name=f"model_evaluation_{model_name}_alpha:{alpha}"
             with mlflow.start_run(run_name=run_name,nested=True) as child_run:
+                model_pipeline=Implement_Model(model_name,alpha)
                 cv=KFold(n_splits=10, shuffle=True, random_state=42)
                 scores=cross_val_score(model_pipeline, X_train, y_train, cv=cv, scoring='neg_root_mean_squared_error',error_score="raise")
                 cv_train_rmse=-np.mean(scores)
                 cv_train_std=np.std(scores)
                 mlflow.log_metric("cv_train_rmse", cv_train_rmse)
                 mlflow.log_metric("cv_train_std",cv_train_std)
-                mlflow.log_param("alpha.{}".format(model_name),alphas)
-            
-                    
+                mlflow.log_param("alpha",alpha)
+                mlflow.log_param("model",model_name)
+
                 logger.info("CV RMSE scores for %s: %s", model_name, scores)
                 logger.info("cv_train_rmse_%s=%s", model_name, cv_train_rmse)
                 logger.info("cv_train_std_%s=%s", model_name, cv_train_std)
 
+                logger.info("Fitting {}".format(model_name))
+                model_pipeline.fit(X_train,y_train)
+                logger.info("fit completed {}".format(model_name))
+
+                y_pred=model_pipeline.predict(X_val)
+                rmse=root_mean_squared_error(y_val,y_pred)
+                mae=mean_absolute_error(y_val,y_pred)
+                r2=r2_score(y_val,y_pred)
+        
+
+                mlflow.log_metric("val_rmse", rmse)
+                mlflow.log_metric("val_mae", mae)
+                mlflow.log_metric("val_r2", r2)
+
+
+                signature=infer_signature(X_val.head(10),model_pipeline.predict(X_val.head(10)))
+                mlflow.sklearn.log_model(
+                sk_model=model_pipeline,
+                artifact_path="model_pipeline",
+                signature=signature)
+
+                
             
 
 if __name__=="__main__":
@@ -138,14 +147,14 @@ if __name__=="__main__":
    X_train,y_train,X_test,y_test,X_val,y_val=get_data()
 
    logger.info("shape of x_train:{}".format(X_train.shape))
-   models={"linearRegression","RidgeRegression","LassoRegression"}
+   models_name={"LinearRegression","RidgeRegression","LassoRegression"}
    
     
 
-   for model in models:
-       model_pipeline,model_name=Implement_Model(model)
+   for model_name in models_name:
+       #model_pipeline,model_name=Implement_Model(model)
       
-       model_evaluation(model_name,model_pipeline,X_train,y_train,X_test,y_test,X_val,y_val)
+       model_evaluation(model_name,X_train,y_train,X_test,y_test,X_val,y_val)
        
    
 
